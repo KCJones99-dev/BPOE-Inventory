@@ -12,7 +12,7 @@ const supabase = createClient(
 
 export default function InventoryManagementPage() {
   const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =(useState(true));
   
   // UI States
   const [showAddForm, setShowAddForm] = useState(false);
@@ -25,42 +25,51 @@ export default function InventoryManagementPage() {
   const [newCost, setNewCost] = useState('');
   const [newPar, setNewPar] = useState(5);
 
-  // Movement Modal State (Deliveries / Usage)
+  // Movement Modal State
   const [movementType, setMovementType] = useState<'delivery' | 'usage'>('delivery');
   const [movementQty, setMovementQty] = useState(1);
   const [movementNotes, setMovementNotes] = useState('');
 
   useEffect(() => {
-    fetchInventoryWithMovements();
+    fetchInventoryData();
   }, []);
 
-  async function fetchInventoryWithMovements() {
+  async function fetchInventoryData() {
     try {
       setLoading(true);
-      // Query items and join stock_movements via the established foreign key relationship
-      const { data, error } = await supabase
+      
+      // 1. Fetch items
+      const { data: itemsData, error: itemsError } = await supabase
         .from('items')
-        .select(`
-          *,
-          stock_movements (
-            quantity_change
-          )
-        `)
+        .select('*')
         .order('name', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching inventory:', error);
-      } else if (data) {
-        // Calculate current stock dynamically from the movements array
-        const processedItems = data.map((item: any) => {
-          const totalStock = item.stock_movements?.reduce(
-            (acc: number, curr: any) => acc + (curr.quantity_change || 0), 
-            0
-          ) ?? 0;
-          return { ...item, current_stock: totalStock };
-        });
-        setItems(processedItems);
+      if (itemsError) {
+        console.error('Error fetching items:', itemsError);
+        setLoading(false);
+        return;
       }
+
+      // 2. Fetch all stock movements to calculate totals safely
+      const { data: movementsData, error: movementsError } = await supabase
+        .from('stock_movements')
+        .select('item_id, quantity_change');
+
+      if (movementsError) {
+        console.warn('Movements table check warning:', movementsError);
+      }
+
+      // 3. Map quantities to items
+      const processedItems = (itemsData || []).map((item: any) => {
+        const itemMovements = (movementsData || []).filter((m: any) => m.item_id === item.id);
+        const totalStock = itemMovements.reduce(
+          (acc: number, curr: any) => acc + (curr.quantity_change || 0), 
+          0
+        );
+        return { ...item, current_stock: totalStock };
+      });
+
+      setItems(processedItems);
     } catch (err) {
       console.error('Unexpected error:', err);
     } finally {
@@ -89,7 +98,7 @@ export default function InventoryManagementPage() {
         setNewName('');
         setNewCost('');
         setShowAddForm(false);
-        fetchInventoryWithMovements();
+        fetchInventoryData();
       }
     } catch (err) {
       console.error('Unexpected error:', err);
@@ -100,7 +109,6 @@ export default function InventoryManagementPage() {
     e.preventDefault();
     if (!selectedItemForMovement) return;
 
-    // Deliveries add stock (+), usage removes stock (-)
     const multiplier = movementType === 'delivery' ? 1 : -1;
     const finalChange = Number(movementQty) * multiplier;
 
@@ -119,7 +127,7 @@ export default function InventoryManagementPage() {
         setSelectedItemForMovement(null);
         setMovementQty(1);
         setMovementNotes('');
-        fetchInventoryWithMovements();
+        fetchInventoryData();
       }
     } catch (err) {
       console.error('Unexpected error:', err);
@@ -130,7 +138,6 @@ export default function InventoryManagementPage() {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      // Clear associated movements first if cascade isn't set up on the foreign key constraint
       await supabase.from('stock_movements').delete().eq('item_id', id);
       const { error } = await supabase.from('items').delete().eq('id', id);
       
