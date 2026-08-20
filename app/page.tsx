@@ -14,6 +14,9 @@ export default function InventoryManagementPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Sorting State
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
   // UI States
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedItemForMovement, setSelectedItemForMovement] = useState<any | null>(null);
@@ -31,18 +34,18 @@ export default function InventoryManagementPage() {
   const [movementNotes, setMovementNotes] = useState('');
 
   useEffect(() => {
-    fetchInventoryData();
-  }, []);
+    fetchInventoryData(sortOrder);
+  }, [sortOrder]);
 
-  async function fetchInventoryData() {
+  async function fetchInventoryData(order: 'asc' | 'desc') {
     try {
       setLoading(true);
       
-      // 1. Fetch items
+      // 1. Fetch items with selected sort direction
       const { data: itemsData, error: itemsError } = await supabase
         .from('items')
         .select('*')
-        .order('name', { ascending: true });
+        .order('name', { ascending: order === 'asc' });
 
       if (itemsError) {
         console.error('Error fetching items:', itemsError);
@@ -77,6 +80,10 @@ export default function InventoryManagementPage() {
     }
   }
 
+  function toggleSort() {
+    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+  }
+
   async function handleAddItem(e: React.FormEvent) {
     e.preventDefault();
     if (!newName) return;
@@ -98,7 +105,7 @@ export default function InventoryManagementPage() {
         setNewName('');
         setNewCost('');
         setShowAddForm(false);
-        fetchInventoryData();
+        fetchInventoryData(sortOrder);
       }
     } catch (err) {
       console.error('Unexpected error:', err);
@@ -130,7 +137,7 @@ export default function InventoryManagementPage() {
         setSelectedItemForMovement(null);
         setMovementQty(1);
         setMovementNotes('');
-        fetchInventoryData();
+        fetchInventoryData(sortOrder);
       }
     } catch (err) {
       console.error('Unexpected error:', err);
@@ -305,7 +312,15 @@ export default function InventoryManagementPage() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="p-3">Item Name</th>
+                <th className="p-3">
+                  <button 
+                    onClick={toggleSort}
+                    className="flex items-center space-x-1 font-bold text-gray-700 hover:text-black focus:outline-none"
+                  >
+                    <span>Item Name</span>
+                    <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
+                  </button>
+                </th>
                 <th className="p-3">Category</th>
                 <th className="p-3">Size</th>
                 <th className="p-3">Current Stock</th>
