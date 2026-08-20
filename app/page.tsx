@@ -480,7 +480,7 @@ export default function InventoryManagementPage() {
                 <th className="px-6 py-4 font-bold text-gray-700">Category</th>
                 <th className="px-6 py-4 font-bold text-gray-700">Size</th>
                 <th className="px-6 py-4 font-bold text-gray-700">Current Stock</th>
-                <th className="px-6 py-4 font-bold text-gray-700">Par Level</th>
+                <th className="px-6 py-4 font-bold text-gray-700">Reorder Level</th>
                 <th className="px-6 py-4 font-bold text-gray-700">Unit Cost</th>
                 <th className="px-6 py-4 font-bold text-gray-700 text-right">Actions</th>
               </tr>
