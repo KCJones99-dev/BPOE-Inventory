@@ -312,7 +312,7 @@ export default function InventoryManagementPage() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="p-3">
+                <th className="px-6 py-4">
                   <button 
                     onClick={toggleSort}
                     className="flex items-center space-x-1 font-bold text-gray-700 hover:text-black focus:outline-none"
@@ -321,12 +321,12 @@ export default function InventoryManagementPage() {
                     <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
                   </button>
                 </th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Size</th>
-                <th className="p-3">Current Stock</th>
-                <th className="p-3">Par Level</th>
-                <th className="p-3">Unit Cost</th>
-                <th className="p-3 text-right">Actions</th>
+                <th className="px-6 py-4 font-bold text-gray-700">Category</th>
+                <th className="px-6 py-4 font-bold text-gray-700">Size</th>
+                <th className="px-6 py-4 font-bold text-gray-700">Current Stock</th>
+                <th className="px-6 py-4 font-bold text-gray-700">Par Level</th>
+                <th className="px-6 py-4 font-bold text-gray-700">Unit Cost</th>
+                <th className="px-6 py-4 font-bold text-gray-700 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -337,25 +337,25 @@ export default function InventoryManagementPage() {
 
                 return (
                   <tr key={item.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3 font-medium text-gray-900">
+                    <td className="px-6 py-4 font-medium text-gray-900">
                       {item.name}
                     </td>
-                    <td className="p-3">
+                    <td className="px-6 py-4">
                       <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-semibold">
                         {item.category}
                       </span>
                     </td>
-                    <td className="p-3 text-gray-600">
+                    <td className="px-6 py-4 text-gray-600">
                       {item.bottle_size_ml} ml
                     </td>
-                    <td className="p-3">
+                    <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded text-sm font-bold ${isLow ? 'bg-red-100 text-red-700' : 'text-gray-800'}`}>
                         {stock} {isLow && '⚠️ Low'}
                       </span>
                     </td>
-                    <td className="p-3 text-gray-600">{par}</td>
-                    <td className="p-3 text-gray-600">${item.unit_cost?.toFixed(2)}</td>
-                    <td className="p-3 text-right space-x-2">
+                    <td className="px-6 py-4 text-gray-600">{par}</td>
+                    <td className="px-6 py-4 text-gray-600">${item.unit_cost?.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right space-x-2">
                       <button
                         onClick={() => setSelectedItemForMovement(item)}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-semibold border"
