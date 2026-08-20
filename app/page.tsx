@@ -17,6 +17,11 @@ export default function InventoryManagementPage() {
   // Sorting State
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
+  // Admin Mode State
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const [showAdminModal, setShowAdminModal] = useState(false);
+
   // UI States
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedItemForMovement, setSelectedItemForMovement] = useState<any | null>(null);
@@ -41,7 +46,6 @@ export default function InventoryManagementPage() {
     try {
       setLoading(true);
       
-      // 1. Fetch items with selected sort direction
       const { data: itemsData, error: itemsError } = await supabase
         .from('items')
         .select('*')
@@ -53,7 +57,6 @@ export default function InventoryManagementPage() {
         return;
       }
 
-      // 2. Fetch all stock movements to calculate totals safely
       const { data: movementsData, error: movementsError } = await supabase
         .from('stock_movements')
         .select('item_id, quantity_change');
@@ -62,7 +65,6 @@ export default function InventoryManagementPage() {
         console.warn('Movements table check warning:', movementsError);
       }
 
-      // 3. Map quantities to items
       const processedItems = (itemsData || []).map((item: any) => {
         const itemMovements = (movementsData || []).filter((m: any) => m.item_id === item.id);
         const totalStock = itemMovements.reduce(
@@ -82,6 +84,35 @@ export default function InventoryManagementPage() {
 
   function toggleSort() {
     setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+  }
+
+  function handleAdminLogin(e: React.FormEvent) {
+    e.preventDefault();
+    // Simple frontend gate. For production security, you would validate this against a secure backend or user auth.
+    if (adminPasswordInput === 'admin123') { 
+      setIsAdmin(true);
+      setShowAdminModal(false);
+      setAdminPasswordInput('');
+    } else {
+      alert('Incorrect admin password.');
+    }
+  }
+
+  async function handleUpdatePar(id: string, newParVal: number) {
+    try {
+      const { error } = await supabase
+        .from('items')
+        .update({ par_level: newParVal })
+        .eq('id', id);
+
+      if (error) {
+        alert('Failed to update par level: ' + error.message);
+      } else {
+        setItems(items.map(item => item.id === id ? { ...item, par_level: newParVal } : item));
+      }
+    } catch (err) {
+      console.error('Unexpected error updating par:', err);
+    }
   }
 
   async function handleAddItem(e: React.FormEvent) {
@@ -164,14 +195,72 @@ export default function InventoryManagementPage() {
   return (
     <main className="p-8 max-w-6xl mx-auto font-sans">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Bar & Restaurant Inventory</h1>
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
-        >
-          {showAddForm ? 'Cancel' : '+ Add New Item'}
-        </button>
+        <div>
+          <h1 className="text-3xl font-bold">Bar & Restaurant Inventory</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Mode: <span className={`font-semibold ${isAdmin ? 'text-purple-600' : 'text-blue-600'}`}>{isAdmin ? '🔒 Admin Mode' : 'Standard Staff View'}</span>
+          </p>
+        </div>
+        
+        <div className="space-x-3">
+          {isAdmin ? (
+            <button
+              onClick={() => setIsAdmin(false)}
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition text-sm"
+            >
+              Lock Admin
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowAdminModal(true)}
+              className="bg-purple-100 text-purple-700 border border-purple-300 px-4 py-2 rounded-lg font-medium hover:bg-purple-200 transition text-sm"
+            >
+              Admin Login
+            </button>
+          )}
+
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+          >
+            {showAddForm ? 'Cancel' : '+ Add New Item'}
+          </button>
+        </div>
       </div>
+
+      {/* Admin Login Modal */}
+      {showAdminModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
+            <h2 className="text-lg font-bold mb-2">Enter Admin PIN</h2>
+            <form onSubmit={handleAdminLogin} className="space-y-4">
+              <input
+                type="password"
+                required
+                value={adminPasswordInput}
+                onChange={(e) => setAdminPasswordInput(e.target.value)}
+                placeholder="Admin Password"
+                className="w-full border rounded p-2 text-sm bg-white"
+              />
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdminModal(false)}
+                  className="px-3 py-1.5 border rounded text-sm text-gray-600 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 bg-purple-600 text-white rounded text-sm font-medium hover:bg-purple-700"
+                >
+                  Unlock
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Add New Item Form */}
       {showAddForm && (
@@ -353,7 +442,18 @@ export default function InventoryManagementPage() {
                         {stock} {isLow && '⚠️ Low'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">{par}</td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {isAdmin ? (
+                        <input
+                          type="number"
+                          defaultValue={par}
+                          onBlur={(e) => handleUpdatePar(item.id, Number(e.target.value))}
+                          className="w-16 border rounded p-1 text-sm bg-white font-medium text-purple-700"
+                        />
+                      ) : (
+                        par
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-gray-600">${item.unit_cost?.toFixed(2)}</td>
                     <td className="px-6 py-4 text-right space-x-2">
                       <button
@@ -362,12 +462,15 @@ export default function InventoryManagementPage() {
                       >
                         Adjust Stock
                       </button>
-                      <button
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="text-red-600 hover:text-red-800 text-xs font-medium"
-                      >
-                        Delete
-                      </button>
+                      
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteItem(item.id)}
+                          className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 px-2.5 py-1 rounded text-xs font-semibold transition"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
