@@ -212,16 +212,16 @@ export default function InventoryManagementPage() {
   // If not authenticated as regular user, show gate
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4 font-sans text-slate-100">
-        <div className="bg-slate-800 rounded-2xl p-8 max-w-md w-full shadow-2xl border border-slate-700">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 mb-4 border border-indigo-500/20">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-100">
+        <div className="bg-slate-900 rounded-2xl p-8 max-w-md w-full shadow-2xl border border-slate-800">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 mb-3 border border-indigo-500/20">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Inventory Portal</h1>
-            <p className="text-sm text-slate-400 mt-1">Please enter your staff password to continue.</p>
+            <h1 className="text-xl font-bold tracking-tight text-white">Inventory Portal</h1>
+            <p className="text-xs text-slate-400 mt-1">Please enter your staff password to continue.</p>
           </div>
           <form onSubmit={handleRegularLogin} className="space-y-4">
             <div>
@@ -231,12 +231,12 @@ export default function InventoryManagementPage() {
                 value={globalPasswordInput}
                 onChange={(e) => setGlobalPasswordInput(e.target.value)}
                 placeholder="Staff Password"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/20 text-sm"
+              className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/20 text-sm"
             >
               Sign In
             </button>
@@ -247,18 +247,18 @@ export default function InventoryManagementPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 p-6 md:p-10 font-sans">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <main className="min-h-screen bg-slate-100 text-slate-900 p-4 md:p-8 font-sans">
+      <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Bar & Restaurant Inventory</h1>
-            <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-xs uppercase tracking-wider font-semibold text-slate-400">Status:</span>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900">Inventory Management</h1>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Access:</span>
               {isAdmin ? (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span> Admin Mode Unlocked
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span> Admin Mode
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
@@ -268,7 +268,7 @@ export default function InventoryManagementPage() {
             </div>
           </div>
           
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => {
                 setIsAuthenticated(false);
@@ -282,7 +282,7 @@ export default function InventoryManagementPage() {
             {!isAdmin ? (
               <button
                 onClick={() => setShowAdminLoginModal(true)}
-                className="bg-purple-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-purple-500 transition text-sm shadow-sm shadow-purple-600/20"
+                className="bg-purple-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-purple-500 transition text-sm shadow-xs"
               >
                 Admin Login
               </button>
@@ -291,16 +291,16 @@ export default function InventoryManagementPage() {
                 onClick={() => setIsAdmin(false)}
                 className="bg-purple-50 text-purple-700 border border-purple-200 px-4 py-2 rounded-xl font-medium hover:bg-purple-100 transition text-sm"
               >
-               Exit Admin
+                Exit Admin
               </button>
             )}
 
             {isAdmin && (
               <button
                 onClick={() => setShowAddForm(!showAddForm)}
-                className="bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-emerald-500 transition text-sm shadow-sm shadow-emerald-600/20"
+                className="bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-emerald-500 transition text-sm shadow-xs"
               >
-                {showAddForm ? 'Cancel' : '+ Add New Item'}
+                {showAddForm ? 'Cancel' : '+ Add Item'}
               </button>
             )}
           </div>
@@ -308,8 +308,8 @@ export default function InventoryManagementPage() {
 
         {/* Admin Login Modal */}
         {showAdminLoginModal && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-200">
               <h2 className="text-lg font-bold text-slate-900 mb-1">Enter Admin PIN</h2>
               <p className="text-xs text-slate-500 mb-4">Required to add items, change costs, or delete entries.</p>
               <form onSubmit={handleAdminLogin} className="space-y-4">
@@ -319,9 +319,9 @@ export default function InventoryManagementPage() {
                   value={adminPasswordInput}
                   onChange={(e) => setAdminPasswordInput(e.target.value)}
                   placeholder="Admin PIN"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                 />
-                <div className="flex justify-end space-x-2 pt-2">
+                <div className="flex justify-end space-x-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setShowAdminLoginModal(false)}
@@ -331,7 +331,7 @@ export default function InventoryManagementPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-500 transition shadow-sm shadow-purple-600/20"
+                    className="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-500 transition"
                   >
                     Unlock
                   </button>
@@ -343,11 +343,11 @@ export default function InventoryManagementPage() {
 
         {/* Add New Item Form (Admin Only) */}
         {isAdmin && showAddForm && (
-          <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs animate-in fade-in slide-in-from-top-2 duration-200">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Add New Inventory Item</h2>
+          <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs">
+            <h2 className="text-base font-bold text-slate-900 mb-4">Add New Inventory Item</h2>
             <form onSubmit={handleAddItem} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Item Name</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Item Name</label>
                 <input
                   type="text"
                   required
@@ -358,7 +358,7 @@ export default function InventoryManagementPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Category</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Category</label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
@@ -373,7 +373,7 @@ export default function InventoryManagementPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Bottle Size (mL)</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Bottle Size (mL)</label>
                 <input
                   type="number"
                   value={newSize}
@@ -382,7 +382,7 @@ export default function InventoryManagementPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Unit Cost ($)</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Unit Cost ($)</label>
                 <input
                   type="number"
                   step="0.01"
@@ -393,7 +393,7 @@ export default function InventoryManagementPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Reorder Level</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Reorder Level</label>
                 <input
                   type="number"
                   value={newPar}
@@ -404,7 +404,7 @@ export default function InventoryManagementPage() {
               <div className="flex items-end">
                 <button
                   type="submit"
-                  className="w-full bg-emerald-600 text-white py-2.5 rounded-xl font-medium hover:bg-emerald-500 transition shadow-sm shadow-emerald-600/20 text-sm"
+                  className="w-full bg-emerald-600 text-white py-2.5 rounded-xl font-medium hover:bg-emerald-500 transition text-sm shadow-xs"
                 >
                   Save Item
                 </button>
@@ -415,14 +415,14 @@ export default function InventoryManagementPage() {
 
         {/* Stock Adjustment Modal */}
         {selectedItemForMovement && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
-              <h2 className="text-xl font-bold text-slate-900 mb-0.5">Manage Stock</h2>
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-200">
+              <h2 className="text-lg font-bold text-slate-900 mb-0.5">Manage Stock</h2>
               <p className="text-sm font-medium text-indigo-600 mb-4">{selectedItemForMovement.name}</p>
               
               <form onSubmit={handleRecordMovement} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Movement Type</label>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Movement Type</label>
                   <select
                     value={movementType}
                     onChange={(e: any) => setMovementType(e.target.value)}
@@ -433,7 +433,7 @@ export default function InventoryManagementPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Quantity</label>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Quantity</label>
                   <input
                     type="number"
                     min="1"
@@ -444,7 +444,7 @@ export default function InventoryManagementPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Notes (Optional)</label>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Notes (Optional)</label>
                   <input
                     type="text"
                     value={movementNotes}
@@ -453,7 +453,7 @@ export default function InventoryManagementPage() {
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                   />
                 </div>
-                <div className="flex justify-end space-x-3 pt-2">
+                <div className="flex justify-end space-x-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setSelectedItemForMovement(null)}
@@ -463,7 +463,7 @@ export default function InventoryManagementPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-500 transition shadow-sm shadow-indigo-600/20"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-500 transition"
                   >
                     Save Movement
                   </button>
@@ -476,15 +476,15 @@ export default function InventoryManagementPage() {
         {/* Main Inventory Table Container */}
         <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-slate-500 text-sm">Loading inventory dashboard...</div>
+            <div className="p-12 text-center text-slate-500 text-sm">Loading inventory data...</div>
           ) : items.length === 0 ? (
             <div className="p-12 text-center text-slate-500 text-sm">No inventory items found.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/75 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
-                    <th className="px-6 py-4">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                    <th className="px-6 py-3.5">
                       <button 
                         onClick={toggleSort}
                         className="flex items-center space-x-1.5 font-bold text-slate-700 hover:text-slate-900 focus:outline-none"
@@ -493,12 +493,12 @@ export default function InventoryManagementPage() {
                         <span className="text-xs">{sortOrder === 'asc' ? '▲' : '▼'}</span>
                       </button>
                     </th>
-                    <th className="px-6 py-4">Category</th>
-                    <th className="px-6 py-4">Size</th>
-                    <th className="px-6 py-4">Current Stock</th>
-                    <th className="px-6 py-4">Reorder Level</th>
-                    <th className="px-6 py-4">Unit Cost</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-6 py-3.5">Category</th>
+                    <th className="px-6 py-3.5">Size</th>
+                    <th className="px-6 py-3.5">Current Stock</th>
+                    <th className="px-6 py-3.5">Reorder Level</th>
+                    <th className="px-6 py-3.5">Unit Cost</th>
+                    <th className="px-6 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -509,20 +509,20 @@ export default function InventoryManagementPage() {
                     const isLow = stock < par;
 
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="px-6 py-4 font-semibold text-slate-900">
+                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-6 py-3.5 font-semibold text-slate-900">
                           {item.name}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-3.5">
                           <span className="inline-flex px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-100">
                             {item.category}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-slate-600 font-medium">
+                        <td className="px-6 py-3.5 text-slate-600 font-medium">
                           {item.bottle_size_ml} mL
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${
+                        <td className="px-6 py-3.5">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold ${
                             isLow 
                               ? 'bg-rose-50 text-rose-700 border border-rose-200' 
                               : 'bg-slate-100 text-slate-800'
@@ -530,7 +530,7 @@ export default function InventoryManagementPage() {
                             {stock} {isLow && '⚠️ Low'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-slate-600">
+                        <td className="px-6 py-3.5 text-slate-600">
                           {isAdmin ? (
                             <input
                               type="number"
@@ -542,7 +542,7 @@ export default function InventoryManagementPage() {
                             <span className="font-medium">{par}</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-slate-600">
+                        <td className="px-6 py-3.5 text-slate-600">
                           {isAdmin ? (
                             <div className="inline-flex items-center bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-purple-500 transition">
                               <span className="text-slate-400 mr-1">$</span>
@@ -558,12 +558,12 @@ export default function InventoryManagementPage() {
                             <span className="font-medium">${Number(cost).toFixed(2)}</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-right space-x-2">
+                        <td className="px-6 py-3.5 text-right space-x-2">
                           <button
                             onClick={() => setSelectedItemForMovement(item)}
                             className="bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 shadow-xs transition"
                           >
-                            Adjust Stock
+                            Adjust
                           </button>
                           
                           {isAdmin && (
