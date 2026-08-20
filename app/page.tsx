@@ -379,7 +379,7 @@ export default function InventoryManagementPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Par Level</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Reorder Level</label>
             <input
               type="number"
               value={newPar}
