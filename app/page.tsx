@@ -197,19 +197,14 @@ export default function InventoryManagementPage() {
     }
   }
 
-  // --- iOS-INSPIRED LOGIN GATE ---
+  // --- CLEAN, MINIMAL iOS-INSPIRED LOGIN GATE ---
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-[#F2F2F7] flex items-center justify-center p-4 font-sans text-slate-900 antialiased">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 max-w-sm w-full shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/40">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-500 text-white shadow-md shadow-blue-500/20 mb-3">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900">Inventory Access</h1>
-            <p className="text-xs text-slate-500 mt-1">Enter staff password to unlock system</p>
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 max-w-sm w-full shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/60">
+          <div className="mb-6">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Inventory Portal</h1>
+            <p className="text-xs text-slate-500 mt-1">Enter your staff password to continue.</p>
           </div>
           <form onSubmit={handleRegularLogin} className="space-y-3">
             <input
@@ -217,7 +212,7 @@ export default function InventoryManagementPage() {
               required
               value={globalPasswordInput}
               onChange={(e) => setGlobalPasswordInput(e.target.value)}
-              placeholder="Password"
+              placeholder="Staff Password"
               className="w-full bg-[#F2F2F7] border border-transparent rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition-all shadow-inner"
             />
             <button
@@ -232,24 +227,24 @@ export default function InventoryManagementPage() {
     );
   }
 
-  // --- iOS-INSPIRED MAIN APP DASHBOARD ---
+  // --- POLISHED MAIN APP DASHBOARD ---
   return (
     <main className="min-h-screen bg-[#F2F2F7] text-slate-900 p-4 md:p-8 font-sans antialiased">
       <div className="max-w-6xl mx-auto space-y-6">
         
-        {/* iOS Header Navigation Bar Style */}
-        <div className="bg-white/80 backdrop-blur-xl p-5 rounded-3xl border border-white/60 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Navigation Bar / Header Card */}
+        <div className="bg-white/90 backdrop-blur-xl p-5 rounded-3xl border border-white/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-semibold tracking-widest text-blue-600 uppercase">Live Inventory</span>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Stock Dashboard</h1>
+            <span className="text-[11px] font-semibold tracking-wider text-blue-600 uppercase">Bar & Restaurant</span>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Inventory Dashboard</h1>
             <div className="flex items-center gap-2 mt-1">
               {isAdmin ? (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span> Admin Mode
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span> Admin Mode Unlocked
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Staff Mode
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Staff View
                 </span>
               )}
             </div>
@@ -297,8 +292,8 @@ export default function InventoryManagementPage() {
         {showAdminLoginModal && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-200">
-              <h2 className="text-lg font-semibold text-slate-900 mb-1">Admin Authentication</h2>
-              <p className="text-xs text-slate-500 mb-4">Enter PIN to configure par levels, costs, and records.</p>
+              <h2 className="text-lg font-semibold text-slate-900 mb-1">Enter Admin PIN</h2>
+              <p className="text-xs text-slate-500 mb-4">Required to add items, change costs, or delete entries.</p>
               <form onSubmit={handleAdminLogin} className="space-y-3">
                 <input
                   type="password"
@@ -331,7 +326,7 @@ export default function InventoryManagementPage() {
         {/* Add New Item Form Card */}
         {isAdmin && showAddForm && (
           <div className="bg-white/90 backdrop-blur-xl border border-white/80 p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
-            <h2 className="text-base font-semibold text-slate-900 mb-4">New Inventory Item Details</h2>
+            <h2 className="text-base font-semibold text-slate-900 mb-4">Add New Inventory Item</h2>
             <form onSubmit={handleAddItem} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Item Name</label>
@@ -460,7 +455,7 @@ export default function InventoryManagementPage() {
           </div>
         )}
 
-        {/* iOS Styled Table Container with Grouped Rows */}
+        {/* Inventory List Container */}
         <div className="bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-sm">Loading inventory items...</div>
