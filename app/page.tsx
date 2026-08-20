@@ -111,12 +111,14 @@ export default function InventoryManagementPage() {
 
     const multiplier = movementType === 'delivery' ? 1 : -1;
     const finalChange = Number(movementQty) * multiplier;
+    const finalChangeMl = finalChange * (selectedItemForMovement.bottle_size_ml || 0);
 
     try {
       const { error } = await supabase.from('stock_movements').insert([
         {
           item_id: selectedItemForMovement.id,
           quantity_change: finalChange,
+          quantity_ml: finalChangeMl,
           movement_type: movementType,
           notes: movementNotes || (movementType === 'delivery' ? 'Delivery In' : 'Usage Out')
         }
