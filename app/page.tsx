@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// Hardcoded with your real credentials to bypass Vercel build variable checks
 const supabase = createClient(
   'https://ljizxogaenpsvjwdfsht.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqaXp4b2dhZW5wc3Zqd2Rmc2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg0MjcsImV4cCI6MjA1NjgxNDQyN30.YOUR_ACTUAL_ANON_KEY_HERE'
@@ -20,23 +19,12 @@ export default function InventoryPage() {
       try {
         const { data, error } = await supabase
           .from('items')
-          .select(`
-            id,
-            name,
-            category,
-            inventory_counts (
-              quantity
-            )
-          `);
+          .select('*');
 
         if (error) {
           console.error('Error fetching inventory:', error);
         } else if (data) {
-          const formattedItems = data.map((item: any) => ({
-            ...item,
-            quantity: item.inventory_counts?.[0]?.quantity ?? 0
-          }));
-          setItems(formattedItems);
+          setItems(data);
         }
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -62,7 +50,6 @@ export default function InventoryPage() {
             <thead className="bg-gray-100 border-b">
               <tr>
                 <th className="p-3">Item Name</th>
-                <th className="p-3">Quantity</th>
                 <th className="p-3">Category</th>
               </tr>
             </thead>
@@ -70,7 +57,6 @@ export default function InventoryPage() {
               {items.map((item, index) => (
                 <tr key={item.id || index} className="border-b hover:bg-gray-50">
                   <td className="p-3">{item.name || item.item_name || 'Unnamed'}</td>
-                  <td className="p-3">{item.quantity}</td>
                   <td className="p-3">{item.category || 'General'}</td>
                 </tr>
               ))}
