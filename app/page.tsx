@@ -88,7 +88,6 @@ export default function InventoryManagementPage() {
 
   function handleAdminLogin(e: React.FormEvent) {
     e.preventDefault();
-    // Simple frontend gate. For production security, you would validate this against a secure backend or user auth.
     if (adminPasswordInput === 'admin123') { 
       setIsAdmin(true);
       setShowAdminModal(false);
@@ -98,20 +97,20 @@ export default function InventoryManagementPage() {
     }
   }
 
-  async function handleUpdatePar(id: string, newParVal: number) {
+  async function handleUpdateField(id: string, field: string, value: any) {
     try {
       const { error } = await supabase
         .from('items')
-        .update({ par_level: newParVal })
+        .update({ [field]: value })
         .eq('id', id);
 
       if (error) {
-        alert('Failed to update par level: ' + error.message);
+        alert(`Failed to update ${field}: ` + error.message);
       } else {
-        setItems(items.map(item => item.id === id ? { ...item, par_level: newParVal } : item));
+        setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
       }
     } catch (err) {
-      console.error('Unexpected error updating par:', err);
+      console.error(`Unexpected error updating ${field}:`, err);
     }
   }
 
@@ -422,6 +421,7 @@ export default function InventoryManagementPage() {
               {items.map((item) => {
                 const stock = item.current_stock ?? 0;
                 const par = item.par_level ?? 0;
+                const cost = item.unit_cost ?? 0;
                 const isLow = stock < par;
 
                 return (
@@ -447,14 +447,29 @@ export default function InventoryManagementPage() {
                         <input
                           type="number"
                           defaultValue={par}
-                          onBlur={(e) => handleUpdatePar(item.id, Number(e.target.value))}
+                          onBlur={(e) => handleUpdateField(item.id, 'par_level', Number(e.target.value))}
                           className="w-16 border rounded p-1 text-sm bg-white font-medium text-purple-700"
                         />
                       ) : (
                         par
                       )}
                     </td>
-                    <td className="px-6 py-4 text-gray-600">${item.unit_cost?.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {isAdmin ? (
+                        <div className="flex items-center space-x-1">
+                          <span>$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            defaultValue={cost}
+                            onBlur={(e) => handleUpdateField(item.id, 'unit_cost', Number(e.target.value))}
+                            className="w-20 border rounded p-1 text-sm bg-white font-medium text-purple-700"
+                          />
+                        </div>
+                      ) : (
+                        `$${cost.toFixed(2)}`
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-right space-x-2">
                       <button
                         onClick={() => setSelectedItemForMovement(item)}
