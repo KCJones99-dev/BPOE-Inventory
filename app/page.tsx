@@ -90,7 +90,6 @@ export default function InventoryManagementPage() {
 
   function handleRegularLogin(e: React.FormEvent) {
     e.preventDefault();
-    // Set your regular user password here
     if (globalPasswordInput === 'BPOE2257') {
       setIsAuthenticated(true);
       setGlobalPasswordInput('');
@@ -213,11 +212,16 @@ export default function InventoryManagementPage() {
   // If not authenticated as regular user, show gate
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
-        <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-md border">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Inventory Portal</h1>
-            <p className="text-sm text-gray-500 mt-1">Please enter the staff password to view inventory.</p>
+      <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4 font-sans text-slate-100">
+        <div className="bg-slate-800 rounded-2xl p-8 max-w-md w-full shadow-2xl border border-slate-700">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 mb-4 border border-indigo-500/20">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-white">Inventory Portal</h1>
+            <p className="text-sm text-slate-400 mt-1">Please enter your staff password to continue.</p>
           </div>
           <form onSubmit={handleRegularLogin} className="space-y-4">
             <div>
@@ -226,13 +230,13 @@ export default function InventoryManagementPage() {
                 required
                 value={globalPasswordInput}
                 onChange={(e) => setGlobalPasswordInput(e.target.value)}
-                placeholder="Enter Staff Password"
-                className="w-full border rounded-lg p-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Staff Password"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm"
+              className="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/20 text-sm"
             >
               Sign In
             </button>
@@ -243,325 +247,344 @@ export default function InventoryManagementPage() {
   }
 
   return (
-    <main className="p-8 max-w-6xl mx-auto font-sans">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Bar & Restaurant Inventory</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Status: {isAdmin ? (
-              <span className="font-semibold text-purple-600">🔓 Admin Mode Unlocked</span>
-            ) : (
-              <span className="font-semibold text-blue-600">👤 Regular Staff View</span>
-            )}
-          </p>
-        </div>
+    <main className="min-h-screen bg-slate-50 text-slate-900 p-6 md:p-10 font-sans">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        <div className="space-x-3">
-          <button
-            onClick={() => {
-              setIsAuthenticated(false);
-              setIsAdmin(false);
-            }}
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition text-sm"
-          >
-            Log Out
-          </button>
-
-          {!isAdmin ? (
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Bar & Restaurant Inventory</h1>
+            <div className="flex items-center gap-2 mt-1.5">
+              <span className="text-xs uppercase tracking-wider font-semibold text-slate-400">Status:</span>
+              {isAdmin ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span> Admin Mode Unlocked
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-600"></span> Staff View
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
             <button
-              onClick={() => setShowAdminLoginModal(true)}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition text-sm"
+              onClick={() => {
+                setIsAuthenticated(false);
+                setIsAdmin(false);
+              }}
+              className="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl font-medium hover:bg-slate-50 transition text-sm shadow-xs"
             >
-              Admin Login
+              Log Out
             </button>
-          ) : (
-            <button
-              onClick={() => setIsAdmin(false)}
-              className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-medium hover:bg-purple-200 transition text-sm"
-            >
-             Exit Admin
-            </button>
-          )}
 
-          {isAdmin && (
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition"
-            >
-              {showAddForm ? 'Cancel' : '+ Add New Item'}
-            </button>
-          )}
-        </div>
-      </div>
+            {!isAdmin ? (
+              <button
+                onClick={() => setShowAdminLoginModal(true)}
+                className="bg-purple-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-purple-500 transition text-sm shadow-sm shadow-purple-600/20"
+              >
+                Admin Login
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsAdmin(false)}
+                className="bg-purple-50 text-purple-700 border border-purple-200 px-4 py-2 rounded-xl font-medium hover:bg-purple-100 transition text-sm"
+              >
+               Exit Admin
+              </button>
+            )}
 
-      {/* Admin Login Modal */}
-      {showAdminLoginModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
-            <h2 className="text-lg font-bold mb-1">Enter Admin PIN</h2>
-            <p className="text-xs text-gray-500 mb-4">Required to add items, change costs, or delete entries.</p>
-            <form onSubmit={handleAdminLogin} className="space-y-4">
-              <input
-                type="password"
-                required
-                value={adminPasswordInput}
-                onChange={(e) => setAdminPasswordInput(e.target.value)}
-                placeholder="Admin PIN"
-                className="w-full border rounded p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAdminLoginModal(false)}
-                  className="px-3 py-1.5 border rounded text-sm text-gray-600 hover:bg-gray-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-3 py-1.5 bg-purple-600 text-white rounded text-sm font-medium hover:bg-purple-700"
-                >
-                  Unlock
-                </button>
-              </div>
-            </form>
+            {isAdmin && (
+              <button
+                onClick={() => setShowAddForm(!showAddForm)}
+                className="bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-emerald-500 transition text-sm shadow-sm shadow-emerald-600/20"
+              >
+                {showAddForm ? 'Cancel' : '+ Add New Item'}
+              </button>
+            )}
           </div>
         </div>
-      )}
 
-      {/* Add New Item Form (Admin Only) */}
-      {isAdmin && showAddForm && (
-        <form onSubmit={handleAddItem} className="bg-gray-50 border p-6 rounded-lg mb-8 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
-            <input
-              type="text"
-              required
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="e.g. Jameson Irish Whiskey"
-              className="w-full border rounded p-2 text-sm bg-white"
-            />
+        {/* Admin Login Modal */}
+        {showAdminLoginModal && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Enter Admin PIN</h2>
+              <p className="text-xs text-slate-500 mb-4">Required to add items, change costs, or delete entries.</p>
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                <input
+                  type="password"
+                  required
+                  value={adminPasswordInput}
+                  onChange={(e) => setAdminPasswordInput(e.target.value)}
+                  placeholder="Admin PIN"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition"
+                />
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminLoginModal(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-500 transition shadow-sm shadow-purple-600/20"
+                  >
+                    Unlock
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              className="w-full border rounded p-2 text-sm bg-white"
-            >
-              <option value="Spirit">Spirit</option>
-              <option value="Wine">Wine</option>
-              <option value="Beer">Beer</option>
-              <option value="Syrup">Syrup</option>
-              <option value="Mixer">Mixer</option>
-              <option value="Supply">Supply</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bottle Size (mL)</label>
-            <input
-              type="number"
-              value={newSize}
-              onChange={(e) => setNewSize(Number(e.target.value))}
-              className="w-full border rounded p-2 text-sm bg-white"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit Cost ($)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={newCost}
-              onChange={(e) => setNewCost(e.target.value)}
-              placeholder="24.50"
-              className="w-full border rounded p-2 text-sm bg-white"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Reorder Level</label>
-            <input
-              type="number"
-              value={newPar}
-              onChange={(e) => setNewPar(Number(e.target.value))}
-              className="w-full border rounded p-2 text-sm bg-white"
-            />
-          </div>
-          <div className="flex items-end">
-            <button
-              type="submit"
-              className="w-full bg-green-600 text-white py-2 rounded font-medium hover:bg-green-700 transition"
-            >
-              Save Item
-            </button>
-          </div>
-        </form>
-      )}
+        )}
 
-      {/* Stock Adjustment Modal (Available to all authenticated users) */}
-      {selectedItemForMovement && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
-            <h2 className="text-xl font-bold mb-1">Manage Stock</h2>
-            <p className="text-sm text-gray-500 mb-4">{selectedItemForMovement.name}</p>
-            
-            <form onSubmit={handleRecordMovement} className="space-y-4">
+        {/* Add New Item Form (Admin Only) */}
+        {isAdmin && showAddForm && (
+          <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs animate-in fade-in slide-in-from-top-2 duration-200">
+            <h2 className="text-lg font-bold text-slate-900 mb-4">Add New Inventory Item</h2>
+            <form onSubmit={handleAddItem} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Movement Type</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Item Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="e.g. Jameson Irish Whiskey"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Category</label>
                 <select
-                  value={movementType}
-                  onChange={(e: any) => setMovementType(e.target.value)}
-                  className="w-full border rounded p-2 bg-white text-sm"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                 >
-                  <option value="delivery">Delivery In (+)</option>
-                  <option value="usage">Usage / Out (-)</option>
+                  <option value="Spirit">Spirit</option>
+                  <option value="Wine">Wine</option>
+                  <option value="Beer">Beer</option>
+                  <option value="Syrup">Syrup</option>
+                  <option value="Mixer">Mixer</option>
+                  <option value="Supply">Supply</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Bottle Size (mL)</label>
                 <input
                   type="number"
-                  min="1"
-                  required
-                  value={movementQty}
-                  onChange={(e) => setMovementQty(Number(e.target.value))}
-                  className="w-full border rounded p-2 bg-white text-sm"
+                  value={newSize}
+                  onChange={(e) => setNewSize(Number(e.target.value))}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Unit Cost ($)</label>
                 <input
-                  type="text"
-                  value={movementNotes}
-                  onChange={(e) => setMovementNotes(e.target.value)}
-                  placeholder="e.g. Weekly distributor delivery"
-                  className="w-full border rounded p-2 bg-white text-sm"
+                  type="number"
+                  step="0.01"
+                  value={newCost}
+                  onChange={(e) => setNewCost(e.target.value)}
+                  placeholder="24.50"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                 />
               </div>
-              <div className="flex justify-end space-x-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedItemForMovement(null)}
-                  className="px-4 py-2 border rounded text-sm text-gray-600 hover:bg-gray-100"
-                >
-                  Cancel
-                </button>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Reorder Level</label>
+                <input
+                  type="number"
+                  value={newPar}
+                  onChange={(e) => setNewPar(Number(e.target.value))}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                />
+              </div>
+              <div className="flex items-end">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700"
+                  className="w-full bg-emerald-600 text-white py-2.5 rounded-xl font-medium hover:bg-emerald-500 transition shadow-sm shadow-emerald-600/20 text-sm"
                 >
-                  Save Movement
+                  Save Item
                 </button>
               </div>
             </form>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Main Inventory Table */}
-      {loading ? (
-        <p className="text-gray-500">Loading inventory dashboard...</p>
-      ) : items.length === 0 ? (
-        <p className="text-gray-500">No inventory items found.</p>
-      ) : (
-        <div className="border rounded-lg overflow-hidden shadow-sm bg-white">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-gray-100 border-b">
-              <tr>
-                <th className="px-6 py-4">
-                  <button 
-                    onClick={toggleSort}
-                    className="flex items-center space-x-1 font-bold text-gray-700 hover:text-black focus:outline-none"
+        {/* Stock Adjustment Modal */}
+        {selectedItemForMovement && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+              <h2 className="text-xl font-bold text-slate-900 mb-0.5">Manage Stock</h2>
+              <p className="text-sm font-medium text-indigo-600 mb-4">{selectedItemForMovement.name}</p>
+              
+              <form onSubmit={handleRecordMovement} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Movement Type</label>
+                  <select
+                    value={movementType}
+                    onChange={(e: any) => setMovementType(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                   >
-                    <span>Item Name</span>
-                    <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
+                    <option value="delivery">Delivery In (+)</option>
+                    <option value="usage">Usage / Out (-)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={movementQty}
+                    onChange={(e) => setMovementQty(Number(e.target.value))}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Notes (Optional)</label>
+                  <input
+                    type="text"
+                    value={movementNotes}
+                    onChange={(e) => setMovementNotes(e.target.value)}
+                    placeholder="e.g. Weekly distributor delivery"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  />
+                </div>
+                <div className="flex justify-end space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedItemForMovement(null)}
+                    className="px-4 py-2 border border-slate-300 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    Cancel
                   </button>
-                </th>
-                <th className="px-6 py-4 font-bold text-gray-700">Category</th>
-                <th className="px-6 py-4 font-bold text-gray-700">Size</th>
-                <th className="px-6 py-4 font-bold text-gray-700">Current Stock</th>
-                <th className="px-6 py-4 font-bold text-gray-700">Reorder Level</th>
-                <th className="px-6 py-4 font-bold text-gray-700">Unit Cost</th>
-                <th className="px-6 py-4 font-bold text-gray-700 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => {
-                const stock = item.current_stock ?? 0;
-                const par = item.par_level ?? 0;
-                const cost = item.unit_cost ?? 0;
-                const isLow = stock < par;
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-500 transition shadow-sm shadow-indigo-600/20"
+                  >
+                    Save Movement
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
-                return (
-                  <tr key={item.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">
-                      {item.name}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-semibold">
-                        {item.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600">
-                      {item.bottle_size_ml} ml
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-sm font-bold ${isLow ? 'bg-red-100 text-red-700' : 'text-gray-800'}`}>
-                        {stock} {isLow && '⚠️ Low'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600">
-                      {isAdmin ? (
-                        <input
-                          type="number"
-                          defaultValue={par}
-                          onBlur={(e) => handleUpdateField(item.id, 'par_level', Number(e.target.value))}
-                          className="w-16 border rounded p-1 text-sm bg-white font-medium text-purple-700"
-                        />
-                      ) : (
-                        <span>{par}</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600">
-                      {isAdmin ? (
-                        <div className="flex items-center space-x-1">
-                          <span>$</span>
-                          <input
-                            type="number"
-                            step="0.01"
-                            defaultValue={cost}
-                            onBlur={(e) => handleUpdateField(item.id, 'unit_cost', Number(e.target.value))}
-                            className="w-20 border rounded p-1 text-sm bg-white font-medium text-purple-700"
-                          />
-                        </div>
-                      ) : (
-                        <span>${Number(cost).toFixed(2)}</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button
-                        onClick={() => setSelectedItemForMovement(item)}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-semibold border"
+        {/* Main Inventory Table Container */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+          {loading ? (
+            <div className="p-12 text-center text-slate-500 text-sm">Loading inventory dashboard...</div>
+          ) : items.length === 0 ? (
+            <div className="p-12 text-center text-slate-500 text-sm">No inventory items found.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/75 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                    <th className="px-6 py-4">
+                      <button 
+                        onClick={toggleSort}
+                        className="flex items-center space-x-1.5 font-bold text-slate-700 hover:text-slate-900 focus:outline-none"
                       >
-                        Adjust Stock
+                        <span>Item Name</span>
+                        <span className="text-xs">{sortOrder === 'asc' ? '▲' : '▼'}</span>
                       </button>
-                      
-                      {isAdmin && (
-                        <button
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 px-2.5 py-1 rounded text-xs font-semibold transition"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
+                    </th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Size</th>
+                    <th className="px-6 py-4">Current Stock</th>
+                    <th className="px-6 py-4">Reorder Level</th>
+                    <th className="px-6 py-4">Unit Cost</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm">
+                  {items.map((item) => {
+                    const stock = item.current_stock ?? 0;
+                    const par = item.par_level ?? 0;
+                    const cost = item.unit_cost ?? 0;
+                    const isLow = stock < par;
+
+                    return (
+                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-6 py-4 font-semibold text-slate-900">
+                          {item.name}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-100">
+                            {item.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-slate-600 font-medium">
+                          {item.bottle_size_ml} mL
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${
+                            isLow 
+                              ? 'bg-rose-50 text-rose-700 border border-rose-200' 
+                              : 'bg-slate-100 text-slate-800'
+                          }`}>
+                            {stock} {isLow && '⚠️ Low'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-slate-600">
+                          {isAdmin ? (
+                            <input
+                              type="number"
+                              defaultValue={par}
+                              onBlur={(e) => handleUpdateField(item.id, 'par_level', Number(e.target.value))}
+                              className="w-20 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-semibold text-purple-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                            />
+                          ) : (
+                            <span className="font-medium">{par}</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-slate-600">
+                          {isAdmin ? (
+                            <div className="inline-flex items-center bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-purple-500 transition">
+                              <span className="text-slate-400 mr-1">$</span>
+                              <input
+                                type="number"
+                                step="0.01"
+                                defaultValue={cost}
+                                onBlur={(e) => handleUpdateField(item.id, 'unit_cost', Number(e.target.value))}
+                                className="w-20 bg-transparent text-sm font-semibold text-purple-700 focus:outline-none"
+                              />
+                            </div>
+                          ) : (
+                            <span className="font-medium">${Number(cost).toFixed(2)}</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right space-x-2">
+                          <button
+                            onClick={() => setSelectedItemForMovement(item)}
+                            className="bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 shadow-xs transition"
+                          >
+                            Adjust Stock
+                          </button>
+                          
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteItem(item.id)}
+                              className="bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      )}
+
+      </div>
     </main>
   );
 }
