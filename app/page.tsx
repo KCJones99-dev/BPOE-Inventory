@@ -11,16 +11,20 @@ const supabase = createClient(
 );
 
 export default function InventoryManagementPage() {
+  // Global Access Gate State (Regular User)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [globalPasswordInput, setGlobalPasswordInput] = useState('');
+
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Sorting State
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
-  // Admin Mode State
+  // Admin Mode State (Unlocked with admin PIN)
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminLoginModal, setShowAdminLoginModal] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
-  const [showAdminModal, setShowAdminModal] = useState(false);
 
   // UI States
   const [showAddForm, setShowAddForm] = useState(false);
@@ -39,8 +43,10 @@ export default function InventoryManagementPage() {
   const [movementNotes, setMovementNotes] = useState('');
 
   useEffect(() => {
-    fetchInventoryData(sortOrder);
-  }, [sortOrder]);
+    if (isAuthenticated) {
+      fetchInventoryData(sortOrder);
+    }
+  }, [isAuthenticated, sortOrder]);
 
   async function fetchInventoryData(order: 'asc' | 'desc') {
     try {
@@ -82,27 +88,34 @@ export default function InventoryManagementPage() {
     }
   }
 
-  function toggleSort() {
-    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+  function handleRegularLogin(e: React.FormEvent) {
+    e.preventDefault();
+    // Set your regular user password here
+    if (globalPasswordInput === 'BPOE2257') {
+      setIsAuthenticated(true);
+      setGlobalPasswordInput('');
+    } else {
+      alert('Incorrect staff password.');
+    }
   }
 
   function handleAdminLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (adminPasswordInput === 'admin123') { 
+    if (adminPasswordInput === '2257MGMT') {
       setIsAdmin(true);
-      setShowAdminModal(false);
+      setShowAdminLoginModal(false);
       setAdminPasswordInput('');
     } else {
-      alert('Incorrect admin password.');
+      alert('Incorrect Admin PIN.');
     }
   }
 
-  function handleLockAdmin() {
-    setIsAdmin(false);
-    setShowAddForm(false); // Close add form if open when locking out
+  function toggleSort() {
+    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
   }
 
   async function handleUpdateField(id: string, field: string, value: any) {
+    if (!isAdmin) return;
     try {
       const { error } = await supabase
         .from('items')
@@ -121,11 +134,7 @@ export default function InventoryManagementPage() {
 
   async function handleAddItem(e: React.FormEvent) {
     e.preventDefault();
-    if (!isAdmin) {
-      alert('Unauthorized action.');
-      return;
-    }
-    if (!newName) return;
+    if (!isAdmin || !newName) return;
 
     try {
       const { error } = await supabase.from('items').insert([
@@ -201,37 +210,83 @@ export default function InventoryManagementPage() {
     }
   }
 
+  // If not authenticated as regular user, show gate
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
+        <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-md border">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">Inventory Portal</h1>
+            <p className="text-sm text-gray-500 mt-1">Please enter the staff password to view inventory.</p>
+          </div>
+          <form onSubmit={handleRegularLogin} className="space-y-4">
+            <div>
+              <input
+                type="password"
+                required
+                value={globalPasswordInput}
+                onChange={(e) => setGlobalPasswordInput(e.target.value)}
+                placeholder="Enter Staff Password"
+                className="w-full border rounded-lg p-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm"
+            >
+              Sign In
+            </button>
+          </form>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="p-8 max-w-6xl mx-auto font-sans">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold">Bar & Restaurant Inventory</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Mode: <span className={`font-semibold ${isAdmin ? 'text-purple-600' : 'text-blue-600'}`}>{isAdmin ? '🔒 Admin Mode' : 'Standard Staff View'}</span>
+            Status: {isAdmin ? (
+              <span className="font-semibold text-purple-600">🔓 Admin Mode Unlocked</span>
+            ) : (
+              <span className="font-semibold text-blue-600">👤 Regular Staff View</span>
+            )}
           </p>
         </div>
         
         <div className="space-x-3">
-          {isAdmin ? (
+          <button
+            onClick={() => {
+              setIsAuthenticated(false);
+              setIsAdmin(false);
+            }}
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition text-sm"
+          >
+            Lock Screen
+          </button>
+
+          {!isAdmin ? (
             <button
-              onClick={handleLockAdmin}
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition text-sm"
+              onClick={() => setShowAdminLoginModal(true)}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition text-sm"
             >
-              Exit Admin
+              Unlock Admin
             </button>
           ) : (
             <button
-              onClick={() => setShowAdminModal(true)}
-              className="bg-purple-100 text-purple-700 border border-purple-300 px-4 py-2 rounded-lg font-medium hover:bg-purple-200 transition text-sm"
+              onClick={() => setIsAdmin(false)}
+              className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-medium hover:bg-purple-200 transition text-sm"
             >
-              Admin Login
+              Lock Admin
             </button>
           )}
 
           {isAdmin && (
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition"
             >
               {showAddForm ? 'Cancel' : '+ Add New Item'}
             </button>
@@ -240,23 +295,24 @@ export default function InventoryManagementPage() {
       </div>
 
       {/* Admin Login Modal */}
-      {showAdminModal && (
+      {showAdminLoginModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
-            <h2 className="text-lg font-bold mb-2">Enter Admin PIN</h2>
+            <h2 className="text-lg font-bold mb-1">Enter Admin PIN</h2>
+            <p className="text-xs text-gray-500 mb-4">Required to add items, change costs, or delete entries.</p>
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <input
                 type="password"
                 required
                 value={adminPasswordInput}
                 onChange={(e) => setAdminPasswordInput(e.target.value)}
-                placeholder="Admin Password"
-                className="w-full border rounded p-2 text-sm bg-white"
+                placeholder="Admin PIN"
+                className="w-full border rounded p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
-                  onClick={() => setShowAdminModal(false)}
+                  onClick={() => setShowAdminLoginModal(false)}
                   className="px-3 py-1.5 border rounded text-sm text-gray-600 hover:bg-gray-100"
                 >
                   Cancel
@@ -342,7 +398,7 @@ export default function InventoryManagementPage() {
         </form>
       )}
 
-      {/* Stock Adjustment Modal */}
+      {/* Stock Adjustment Modal (Available to all authenticated users) */}
       {selectedItemForMovement && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
@@ -463,7 +519,7 @@ export default function InventoryManagementPage() {
                           className="w-16 border rounded p-1 text-sm bg-white font-medium text-purple-700"
                         />
                       ) : (
-                        par
+                        <span>{par}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-gray-600">
@@ -479,7 +535,7 @@ export default function InventoryManagementPage() {
                           />
                         </div>
                       ) : (
-                        `$${cost.toFixed(2)}`
+                        <span>${Number(cost).toFixed(2)}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
