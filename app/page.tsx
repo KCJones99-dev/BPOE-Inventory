@@ -35,8 +35,8 @@ export default function InventoryManagementPage() {
   const [movementQty, setMovementQty] = useState(1);
   const [movementNotes, setMovementNotes] = useState('');
 
-  // --- NEW: Date-Filtered Activity Log States & Functions ---
-  const [showActivityLog, setShowActivityLog] = useState(false);
+  // Activity Report States
+  const [showActivityReport, setShowActivityReport] = useState(false);
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [logLoading, setLogLoading] = useState(false);
   const [startDate, setStartDate] = useState('');
@@ -113,8 +113,8 @@ export default function InventoryManagementPage() {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching activity logs:', error);
-        alert('Failed to fetch activity log: ' + error.message);
+        console.error('Error fetching activity report:', error);
+        alert('Failed to fetch activity report: ' + error.message);
       } else {
         setActivityLogs(data || []);
       }
@@ -126,10 +126,10 @@ export default function InventoryManagementPage() {
   }
 
   useEffect(() => {
-    if (isAdmin && showActivityLog) {
+    if (isAdmin && showActivityReport) {
       fetchActivityLogs();
     }
-  }, [isAdmin, showActivityLog, startDate, endDate]);
+  }, [isAdmin, showActivityReport, startDate, endDate]);
 
   function handleRegularLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -252,7 +252,6 @@ export default function InventoryManagementPage() {
     }
   }
 
-  // --- CLEAN, MINIMAL iOS-INSPIRED LOGIN GATE ---
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-[#F2F2F7] flex items-center justify-center p-4 font-sans text-slate-900 antialiased">
@@ -282,7 +281,6 @@ export default function InventoryManagementPage() {
     );
   }
 
-  // --- POLISHED MAIN APP DASHBOARD ---
   return (
     <main className="min-h-screen bg-[#F2F2F7] text-slate-900 p-4 md:p-8 font-sans antialiased">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -310,7 +308,7 @@ export default function InventoryManagementPage() {
               onClick={() => {
                 setIsAuthenticated(false);
                 setIsAdmin(false);
-                setShowActivityLog(false);
+                setShowActivityReport(false);
               }}
               className="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-medium hover:bg-slate-200 active:scale-95 transition-all text-xs"
             >
@@ -333,10 +331,10 @@ export default function InventoryManagementPage() {
                   Exit Admin
                 </button>
                 <button
-                  onClick={() => setShowActivityLog(!showActivityLog)}
+                  onClick={() => setShowActivityReport(!showActivityReport)}
                   className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-indigo-500 active:scale-95 transition-all text-xs shadow-md shadow-indigo-600/15"
                 >
-                  {showActivityLog ? 'Hide Activity Log' : 'Activity Log'}
+                  {showActivityReport ? 'Hide Activity Report' : 'Activity Report'}
                 </button>
                 <button
                   onClick={() => setShowAddForm(!showAddForm)}
@@ -354,7 +352,7 @@ export default function InventoryManagementPage() {
           <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-200">
               <h2 className="text-lg font-semibold text-slate-900 mb-1">Enter Admin PIN</h2>
-              <p className="text-xs text-slate-500 mb-4">Required to add items, change costs, or delete entries.</p>
+              <p className="text-xs text-slate-500 mb-4">Required to view activity reports, add items, change costs, or delete entries.</p>
               <form onSubmit={handleAdminLogin} className="space-y-3">
                 <input
                   type="password"
@@ -384,13 +382,13 @@ export default function InventoryManagementPage() {
           </div>
         )}
 
-        {/* --- DATE-FILTERED ACTIVITY LOG PANEL (Admin Only) --- */}
-        {isAdmin && showActivityLog && (
+        {/* --- ACTIVITY REPORT PANEL (Admin Only) --- */}
+        {isAdmin && showActivityReport && (
           <div className="bg-white/95 backdrop-blur-xl border border-indigo-100 p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Inventory Activity Log</h2>
-                <p className="text-xs text-slate-500">Filter stock movements and deliveries by date range.</p>
+                <h2 className="text-base font-bold text-slate-900">Inventory Activity Report</h2>
+                <p className="text-xs text-slate-500">Filter stock movements, deliveries, and usage logs by date range.</p>
               </div>
               <div className="flex items-center gap-2">
                 <div>
@@ -424,7 +422,7 @@ export default function InventoryManagementPage() {
 
             <div className="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
               {logLoading ? (
-                <div className="p-8 text-center text-slate-400 text-xs">Loading activity logs...</div>
+                <div className="p-8 text-center text-slate-400 text-xs">Loading activity report...</div>
               ) : activityLogs.length === 0 ? (
                 <div className="p-8 text-center text-slate-400 text-xs">No activity found for the selected date range.</div>
               ) : (
