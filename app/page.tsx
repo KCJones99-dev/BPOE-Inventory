@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  'httpsljizxogaenpsvjwdfsht.supabase.co', // Keep your clean URL
+  'https://ljizxogaenpsvjwdfsht.supabase.co',
   'sb_publishable_ogNC4cEyQigxxuSZqs7hNg__8nm8_32'
 );
 
@@ -14,7 +14,6 @@ export default function InventoryManagementPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Form state for adding a new item
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('Spirit');
@@ -61,7 +60,6 @@ export default function InventoryManagementPage() {
         console.error('Error adding item:', error);
         alert('Failed to add item.');
       } else {
-        // Reset form and refresh list
         setNewName('');
         setNewCost('');
         setShowAddForm(false);
@@ -99,7 +97,6 @@ export default function InventoryManagementPage() {
         </button>
       </div>
 
-      {/* Add Item Modal / Collapsible Form */}
       {showAddForm && (
         <form onSubmit={handleAddItem} className="bg-gray-50 border p-6 rounded-lg mb-8 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
