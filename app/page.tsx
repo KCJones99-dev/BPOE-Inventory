@@ -12,7 +12,7 @@ const supabase = createClient(
 
 export default function InventoryManagementPage() {
   const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] =(useState(true));
+  const [loading, setLoading] = useState(true);
   
   // UI States
   const [showAddForm, setShowAddForm] = useState(false);
@@ -117,6 +117,7 @@ export default function InventoryManagementPage() {
         {
           item_id: selectedItemForMovement.id,
           quantity_change: finalChange,
+          movement_type: movementType,
           notes: movementNotes || (movementType === 'delivery' ? 'Delivery In' : 'Usage Out')
         }
       ]);
