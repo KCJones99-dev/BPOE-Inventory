@@ -97,6 +97,11 @@ export default function InventoryManagementPage() {
     }
   }
 
+  function handleLockAdmin() {
+    setIsAdmin(false);
+    setShowAddForm(false); // Close add form if open when locking out
+  }
+
   async function handleUpdateField(id: string, field: string, value: any) {
     try {
       const { error } = await supabase
@@ -116,6 +121,10 @@ export default function InventoryManagementPage() {
 
   async function handleAddItem(e: React.FormEvent) {
     e.preventDefault();
+    if (!isAdmin) {
+      alert('Unauthorized action.');
+      return;
+    }
     if (!newName) return;
 
     try {
@@ -175,6 +184,7 @@ export default function InventoryManagementPage() {
   }
 
   async function handleDeleteItem(id: string) {
+    if (!isAdmin) return;
     if (!confirm('Are you sure you want to delete this item?')) return;
 
     try {
@@ -204,10 +214,10 @@ export default function InventoryManagementPage() {
         <div className="space-x-3">
           {isAdmin ? (
             <button
-              onClick={() => setIsAdmin(false)}
+              onClick={handleLockAdmin}
               className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition text-sm"
             >
-              Lock Admin
+              Exit Admin
             </button>
           ) : (
             <button
@@ -218,12 +228,14 @@ export default function InventoryManagementPage() {
             </button>
           )}
 
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
-          >
-            {showAddForm ? 'Cancel' : '+ Add New Item'}
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+            >
+              {showAddForm ? 'Cancel' : '+ Add New Item'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -261,8 +273,8 @@ export default function InventoryManagementPage() {
         </div>
       )}
 
-      {/* Add New Item Form */}
-      {showAddForm && (
+      {/* Add New Item Form (Admin Only) */}
+      {isAdmin && showAddForm && (
         <form onSubmit={handleAddItem} className="bg-gray-50 border p-6 rounded-lg mb-8 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
