@@ -5,10 +5,11 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize with safe fallbacks so the build parser never throws an URL error
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Hardcoded directly to bypass Vercel environment variable injection bugs during build
+const supabase = createClient(
+  'https://ljizxogaenpsvjwdfsht.supabase.co',
+  'sb_publishable_ogNC4cEyQigxxuSZqs7hNg__8nm8_32'
+);
 
 export default function InventoryPage() {
   const [items, setItems] = useState<any[]>([]);
