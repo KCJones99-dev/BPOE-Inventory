@@ -264,7 +264,7 @@ export default function InventoryManagementPage() {
             }}
             className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition text-sm"
           >
-            Lock Screen
+            Log Out
           </button>
 
           {!isAdmin ? (
@@ -272,14 +272,14 @@ export default function InventoryManagementPage() {
               onClick={() => setShowAdminLoginModal(true)}
               className="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition text-sm"
             >
-              Unlock Admin
+              Admin Login
             </button>
           ) : (
             <button
               onClick={() => setIsAdmin(false)}
               className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-medium hover:bg-purple-200 transition text-sm"
             >
-              Lock Admin
+             Exit Admin
             </button>
           )}
 
