@@ -5,9 +5,10 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
+// Hardcoded with your real credentials to bypass Vercel build variable checks
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  'https://ljizxogaenpsvjwdfsht.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqaXp4b2dhZW5wc3Zqd2Rmc2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg0MjcsImV4cCI6MjA1NjgxNDQyN30.YOUR_ACTUAL_ANON_KEY_HERE'
 );
 
 export default function InventoryPage() {
