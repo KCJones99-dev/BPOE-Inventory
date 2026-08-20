@@ -95,10 +95,12 @@ export default function InventoryManagementPage() {
           quantity_change,
           movement_type,
           notes,
+          total_cost,
           items (
             name,
             category,
-            bottle_size_ml
+            bottle_size_ml,
+            unit_cost
           )
         `)
         .order('created_at', { ascending: false });
@@ -209,6 +211,10 @@ export default function InventoryManagementPage() {
     const multiplier = movementType === 'delivery' ? 1 : -1;
     const finalChange = Number(movementQty) * multiplier;
     const finalChangeMl = finalChange * (selectedItemForMovement.bottle_size_ml || 0);
+    
+    // Calculate transaction amount: Unit Cost X Quantity (only for deliveries)
+    const unitCost = Number(selectedItemForMovement.unit_cost) || 0;
+    const transactionTotal = movementType === 'delivery' ? Number(movementQty) * unitCost : 0;
 
     try {
       const { error } = await supabase.from('stock_movements').insert([
@@ -217,6 +223,7 @@ export default function InventoryManagementPage() {
           quantity_change: finalChange,
           quantity_ml: finalChangeMl,
           movement_type: movementType,
+          total_cost: transactionTotal,
           notes: movementNotes || (movementType === 'delivery' ? 'Delivery In' : 'Usage Out')
         }
       ]);
@@ -434,12 +441,14 @@ export default function InventoryManagementPage() {
                         <th className="px-4 py-3">Item Name</th>
                         <th className="px-4 py-3">Type</th>
                         <th className="px-4 py-3">Change</th>
+                        <th className="px-4 py-3">Transaction Amount</th>
                         <th className="px-4 py-3">Notes</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white">
                       {activityLogs.map((log) => {
                         const isDelivery = log.movement_type === 'delivery';
+                        const costVal = Number(log.total_cost) || 0;
                         return (
                           <tr key={log.id} className="hover:bg-slate-50 transition-colors">
                             <td className="px-4 py-2.5 text-slate-500 whitespace-nowrap">
@@ -459,6 +468,9 @@ export default function InventoryManagementPage() {
                               log.quantity_change > 0 ? 'text-emerald-600' : 'text-rose-600'
                             }`}>
                               {log.quantity_change > 0 ? `+${log.quantity_change}` : log.quantity_change}
+                            </td>
+                            <td className="px-4 py-2.5 font-semibold text-slate-700 whitespace-nowrap">
+                              {isDelivery && costVal > 0 ? `$${costVal.toFixed(2)}` : '—'}
                             </td>
                             <td className="px-4 py-2.5 text-slate-600">
                               {log.notes || '—'}
