@@ -13,24 +13,17 @@ const supabase = createClient(
 export default function InventoryPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [debugLog, setDebugLog] = useState('Fetching...');
 
   useEffect(() => {
     async function fetchInventory() {
       try {
-        console.log("Attempting to fetch from 'items'...");
-        const response = await supabase.from('items').select('*');
-        console.log("Full Supabase Response:", response);
-
-        if (response.error) {
-          setDebugLog(`Error: ${response.error.message}`);
-          console.error('Supabase Error:', response.error);
-        } else if (response.data) {
-          setDebugLog(`Success! Found ${response.data.length} rows.`);
-          setItems(response.data);
+        const { data, error } = await supabase.from('items').select('*');
+        if (error) {
+          console.error('Error fetching inventory:', error);
+        } else if (data) {
+          setItems(data);
         }
-      } catch (err: any) {
-        setDebugLog(`Exception: ${err.message}`);
+      } catch (err) {
         console.error('Unexpected error:', err);
       } finally {
         setLoading(false);
@@ -41,32 +34,37 @@ export default function InventoryPage() {
   }, []);
 
   return (
-    <main className="p-8 max-w-4xl mx-auto">
+    <main className="p-8 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Bar & Restaurant Inventory</h1>
       
-      {/* Debug status box */}
-      <div className="mb-4 p-3 bg-gray-100 rounded text-sm font-mono">
-        Status: {debugLog}
-      </div>
-
       {loading ? (
         <p className="text-gray-500">Loading inventory...</p>
       ) : items.length === 0 ? (
         <p className="text-gray-500">No inventory items found.</p>
       ) : (
-        <div className="border rounded-lg overflow-hidden shadow-sm">
+        <div className="border rounded-lg overflow-hidden shadow-sm bg-white">
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="p-3">Item Data</th>
+                <th className="p-3">Item Name</th>
+                <th className="p-3">Category</th>
+                <th className="p-3">Bottle Size (mL)</th>
+                <th className="p-3">Unit Cost</th>
+                <th className="p-3">Par Level</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item, index) => (
                 <tr key={item.id || index} className="border-b hover:bg-gray-50">
-                  <td className="p-3 font-mono text-xs">
-                    {JSON.stringify(item)}
+                  <td className="p-3 font-medium">{item.name}</td>
+                  <td className="p-3">
+                    <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm">
+                      {item.category}
+                    </span>
                   </td>
+                  <td className="p-3">{item.bottle_size_ml} ml</td>
+                  <td className="p-3">${item.unit_cost?.toFixed(2)}</td>
+                  <td className="p-3">{item.par_level}</td>
                 </tr>
               ))}
             </tbody>
