@@ -1,9 +1,10 @@
-export const dynamic = 'force-dynamic';
-
 'use client';
+
+export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+// ... rest of your code ...
 
 // Initialize Supabase Client (You'll plug in your project keys shortly)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
