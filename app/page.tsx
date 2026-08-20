@@ -11,33 +11,26 @@ const supabase = createClient(
 );
 
 export default function InventoryManagementPage() {
-  // Global Access Gate State (Regular User)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [globalPasswordInput, setGlobalPasswordInput] = useState('');
 
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Sorting State
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
-  // Admin Mode State (Unlocked with admin PIN)
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLoginModal, setShowAdminLoginModal] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
 
-  // UI States
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedItemForMovement, setSelectedItemForMovement] = useState<any | null>(null);
 
-  // New Item Form State
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('Spirit');
   const [newSize, setNewSize] = useState(750);
   const [newCost, setNewCost] = useState('');
   const [newPar, setNewPar] = useState(5);
 
-  // Movement Modal State
   const [movementType, setMovementType] = useState<'delivery' | 'usage'>('delivery');
   const [movementQty, setMovementQty] = useState(1);
   const [movementNotes, setMovementNotes] = useState('');
@@ -51,7 +44,6 @@ export default function InventoryManagementPage() {
   async function fetchInventoryData(order: 'asc' | 'desc') {
     try {
       setLoading(true);
-      
       const { data: itemsData, error: itemsError } = await supabase
         .from('items')
         .select('*')
@@ -63,13 +55,9 @@ export default function InventoryManagementPage() {
         return;
       }
 
-      const { data: movementsData, error: movementsError } = await supabase
+      const { data: movementsData } = await supabase
         .from('stock_movements')
         .select('item_id, quantity_change');
-
-      if (movementsError) {
-        console.warn('Movements table check warning:', movementsError);
-      }
 
       const processedItems = (itemsData || []).map((item: any) => {
         const itemMovements = (movementsData || []).filter((m: any) => m.item_id === item.id);
@@ -209,34 +197,32 @@ export default function InventoryManagementPage() {
     }
   }
 
-  // If not authenticated as regular user, show gate
+  // --- iOS-INSPIRED LOGIN GATE ---
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-100">
-        <div className="bg-slate-900 rounded-2xl p-8 max-w-md w-full shadow-2xl border border-slate-800">
+      <main className="min-h-screen bg-[#F2F2F7] flex items-center justify-center p-4 font-sans text-slate-900 antialiased">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 max-w-sm w-full shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/40">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 mb-3 border border-indigo-500/20">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-500 text-white shadow-md shadow-blue-500/20 mb-3">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-white">Inventory Portal</h1>
-            <p className="text-xs text-slate-400 mt-1">Please enter your staff password to continue.</p>
+            <h1 className="text-xl font-semibold tracking-tight text-slate-900">Inventory Access</h1>
+            <p className="text-xs text-slate-500 mt-1">Enter staff password to unlock system</p>
           </div>
-          <form onSubmit={handleRegularLogin} className="space-y-4">
-            <div>
-              <input
-                type="password"
-                required
-                value={globalPasswordInput}
-                onChange={(e) => setGlobalPasswordInput(e.target.value)}
-                placeholder="Staff Password"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-              />
-            </div>
+          <form onSubmit={handleRegularLogin} className="space-y-3">
+            <input
+              type="password"
+              required
+              value={globalPasswordInput}
+              onChange={(e) => setGlobalPasswordInput(e.target.value)}
+              placeholder="Password"
+              className="w-full bg-[#F2F2F7] border border-transparent rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+            />
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/20 text-sm"
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-500 active:scale-[0.98] transition-all shadow-md shadow-blue-600/20 text-sm"
             >
               Sign In
             </button>
@@ -246,35 +232,36 @@ export default function InventoryManagementPage() {
     );
   }
 
+  // --- iOS-INSPIRED MAIN APP DASHBOARD ---
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-900 p-4 md:p-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <main className="min-h-screen bg-[#F2F2F7] text-slate-900 p-4 md:p-8 font-sans antialiased">
+      <div className="max-w-6xl mx-auto space-y-6">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        {/* iOS Header Navigation Bar Style */}
+        <div className="bg-white/80 backdrop-blur-xl p-5 rounded-3xl border border-white/60 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900">Inventory Management</h1>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Access:</span>
+            <span className="text-xs font-semibold tracking-widest text-blue-600 uppercase">Live Inventory</span>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Stock Dashboard</h1>
+            <div className="flex items-center gap-2 mt-1">
               {isAdmin ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span> Admin Mode
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-600"></span> Staff View
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Staff Mode
                 </span>
               )}
             </div>
           </div>
           
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => {
                 setIsAuthenticated(false);
                 setIsAdmin(false);
               }}
-              className="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl font-medium hover:bg-slate-50 transition text-sm shadow-xs"
+              className="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-medium hover:bg-slate-200 active:scale-95 transition-all text-xs"
             >
               Log Out
             </button>
@@ -282,14 +269,14 @@ export default function InventoryManagementPage() {
             {!isAdmin ? (
               <button
                 onClick={() => setShowAdminLoginModal(true)}
-                className="bg-purple-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-purple-500 transition text-sm shadow-xs"
+                className="bg-purple-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-purple-500 active:scale-95 transition-all text-xs shadow-md shadow-purple-600/15"
               >
                 Admin Login
               </button>
             ) : (
               <button
                 onClick={() => setIsAdmin(false)}
-                className="bg-purple-50 text-purple-700 border border-purple-200 px-4 py-2 rounded-xl font-medium hover:bg-purple-100 transition text-sm"
+                className="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl font-medium hover:bg-purple-200 active:scale-95 transition-all text-xs"
               >
                 Exit Admin
               </button>
@@ -298,7 +285,7 @@ export default function InventoryManagementPage() {
             {isAdmin && (
               <button
                 onClick={() => setShowAddForm(!showAddForm)}
-                className="bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-emerald-500 transition text-sm shadow-xs"
+                className="bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-emerald-500 active:scale-95 transition-all text-xs shadow-md shadow-emerald-600/15"
               >
                 {showAddForm ? 'Cancel' : '+ Add Item'}
               </button>
@@ -308,30 +295,30 @@ export default function InventoryManagementPage() {
 
         {/* Admin Login Modal */}
         {showAdminLoginModal && (
-          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-200">
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Enter Admin PIN</h2>
-              <p className="text-xs text-slate-500 mb-4">Required to add items, change costs, or delete entries.</p>
-              <form onSubmit={handleAdminLogin} className="space-y-4">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-200">
+              <h2 className="text-lg font-semibold text-slate-900 mb-1">Admin Authentication</h2>
+              <p className="text-xs text-slate-500 mb-4">Enter PIN to configure par levels, costs, and records.</p>
+              <form onSubmit={handleAdminLogin} className="space-y-3">
                 <input
                   type="password"
                   required
                   value={adminPasswordInput}
                   onChange={(e) => setAdminPasswordInput(e.target.value)}
                   placeholder="Admin PIN"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                  className="w-full bg-[#F2F2F7] border border-transparent rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:bg-white focus:border-purple-500 transition-all"
                 />
                 <div className="flex justify-end space-x-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setShowAdminLoginModal(false)}
-                    className="px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
+                    className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-500 transition"
+                    className="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-500 transition-all shadow-md shadow-purple-600/20"
                   >
                     Unlock
                   </button>
@@ -341,28 +328,28 @@ export default function InventoryManagementPage() {
           </div>
         )}
 
-        {/* Add New Item Form (Admin Only) */}
+        {/* Add New Item Form Card */}
         {isAdmin && showAddForm && (
-          <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs">
-            <h2 className="text-base font-bold text-slate-900 mb-4">Add New Inventory Item</h2>
+          <div className="bg-white/90 backdrop-blur-xl border border-white/80 p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
+            <h2 className="text-base font-semibold text-slate-900 mb-4">New Inventory Item Details</h2>
             <form onSubmit={handleAddItem} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Item Name</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Item Name</label>
                 <input
                   type="text"
                   required
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. Jameson Irish Whiskey"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Category</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Category</label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
                 >
                   <option value="Spirit">Spirit</option>
                   <option value="Wine">Wine</option>
@@ -373,38 +360,38 @@ export default function InventoryManagementPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Bottle Size (mL)</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Bottle Size (mL)</label>
                 <input
                   type="number"
                   value={newSize}
                   onChange={(e) => setNewSize(Number(e.target.value))}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Unit Cost ($)</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Unit Cost ($)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={newCost}
                   onChange={(e) => setNewCost(e.target.value)}
                   placeholder="24.50"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Reorder Level</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Reorder Level</label>
                 <input
                   type="number"
                   value={newPar}
                   onChange={(e) => setNewPar(Number(e.target.value))}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
                 />
               </div>
               <div className="flex items-end">
                 <button
                   type="submit"
-                  className="w-full bg-emerald-600 text-white py-2.5 rounded-xl font-medium hover:bg-emerald-500 transition text-sm shadow-xs"
+                  className="w-full bg-emerald-600 text-white py-3 rounded-xl font-medium hover:bg-emerald-500 transition-all text-sm shadow-md shadow-emerald-600/20"
                 >
                   Save Item
                 </button>
@@ -415,57 +402,57 @@ export default function InventoryManagementPage() {
 
         {/* Stock Adjustment Modal */}
         {selectedItemForMovement && (
-          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-200">
-              <h2 className="text-lg font-bold text-slate-900 mb-0.5">Manage Stock</h2>
-              <p className="text-sm font-medium text-indigo-600 mb-4">{selectedItemForMovement.name}</p>
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-200">
+              <h2 className="text-lg font-semibold text-slate-900">Manage Stock Level</h2>
+              <p className="text-sm font-medium text-blue-600 mb-4">{selectedItemForMovement.name}</p>
               
               <form onSubmit={handleRecordMovement} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Movement Type</label>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Movement Type</label>
                   <select
                     value={movementType}
                     onChange={(e: any) => setMovementType(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-blue-500 transition-all"
                   >
                     <option value="delivery">Delivery In (+)</option>
                     <option value="usage">Usage / Out (-)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Quantity</label>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Quantity</label>
                   <input
                     type="number"
                     min="1"
                     required
                     value={movementQty}
                     onChange={(e) => setMovementQty(Number(e.target.value))}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-blue-500 transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Notes (Optional)</label>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Notes (Optional)</label>
                   <input
                     type="text"
                     value={movementNotes}
                     onChange={(e) => setMovementNotes(e.target.value)}
                     placeholder="e.g. Weekly distributor delivery"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-blue-500 transition-all"
                   />
                 </div>
                 <div className="flex justify-end space-x-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setSelectedItemForMovement(null)}
-                    className="px-4 py-2 border border-slate-300 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
+                    className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-500 transition"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-500 transition-all shadow-md shadow-blue-600/20"
                   >
-                    Save Movement
+                    Confirm
                   </button>
                 </div>
               </form>
@@ -473,32 +460,32 @@ export default function InventoryManagementPage() {
           </div>
         )}
 
-        {/* Main Inventory Table Container */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+        {/* iOS Styled Table Container with Grouped Rows */}
+        <div className="bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-slate-500 text-sm">Loading inventory data...</div>
+            <div className="p-12 text-center text-slate-400 text-sm">Loading inventory items...</div>
           ) : items.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 text-sm">No inventory items found.</div>
+            <div className="p-12 text-center text-slate-400 text-sm">No items added to the inventory yet.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
-                    <th className="px-6 py-3.5">
+                  <tr className="bg-[#F2F2F7]/50 border-b border-slate-100 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    <th className="px-6 py-4">
                       <button 
                         onClick={toggleSort}
                         className="flex items-center space-x-1.5 font-bold text-slate-700 hover:text-slate-900 focus:outline-none"
                       >
                         <span>Item Name</span>
-                        <span className="text-xs">{sortOrder === 'asc' ? '▲' : '▼'}</span>
+                        <span className="text-[10px]">{sortOrder === 'asc' ? '▲' : '▼'}</span>
                       </button>
                     </th>
-                    <th className="px-6 py-3.5">Category</th>
-                    <th className="px-6 py-3.5">Size</th>
-                    <th className="px-6 py-3.5">Current Stock</th>
-                    <th className="px-6 py-3.5">Reorder Level</th>
-                    <th className="px-6 py-3.5">Unit Cost</th>
-                    <th className="px-6 py-3.5 text-right">Actions</th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Size</th>
+                    <th className="px-6 py-4">Current Stock</th>
+                    <th className="px-6 py-4">Reorder Level</th>
+                    <th className="px-6 py-4">Unit Cost</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -509,42 +496,42 @@ export default function InventoryManagementPage() {
                     const isLow = stock < par;
 
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-3.5 font-semibold text-slate-900">
+                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-6 py-4 font-semibold text-slate-900">
                           {item.name}
                         </td>
-                        <td className="px-6 py-3.5">
-                          <span className="inline-flex px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-100">
+                        <td className="px-6 py-4">
+                          <span className="inline-flex px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">
                             {item.category}
                           </span>
                         </td>
-                        <td className="px-6 py-3.5 text-slate-600 font-medium">
+                        <td className="px-6 py-4 text-slate-500 font-medium">
                           {item.bottle_size_ml} mL
                         </td>
-                        <td className="px-6 py-3.5">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold ${
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
                             isLow 
-                              ? 'bg-rose-50 text-rose-700 border border-rose-200' 
-                              : 'bg-slate-100 text-slate-800'
+                              ? 'bg-rose-50 text-rose-600' 
+                              : 'bg-slate-100 text-slate-700'
                           }`}>
                             {stock} {isLow && '⚠️ Low'}
                           </span>
                         </td>
-                        <td className="px-6 py-3.5 text-slate-600">
+                        <td className="px-6 py-4 text-slate-600">
                           {isAdmin ? (
                             <input
                               type="number"
                               defaultValue={par}
                               onBlur={(e) => handleUpdateField(item.id, 'par_level', Number(e.target.value))}
-                              className="w-20 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-semibold text-purple-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                              className="w-20 bg-[#F2F2F7] border border-transparent rounded-lg px-2.5 py-1.5 text-sm font-semibold text-purple-700 focus:bg-white focus:border-purple-500 transition-all"
                             />
                           ) : (
                             <span className="font-medium">{par}</span>
                           )}
                         </td>
-                        <td className="px-6 py-3.5 text-slate-600">
+                        <td className="px-6 py-4 text-slate-600">
                           {isAdmin ? (
-                            <div className="inline-flex items-center bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 focus-within:bg-white focus-within:ring-2 focus-within:ring-purple-500 transition">
+                            <div className="inline-flex items-center bg-[#F2F2F7] border border-transparent rounded-lg px-2.5 py-1.5 focus-within:bg-white focus-within:border-purple-500 transition-all">
                               <span className="text-slate-400 mr-1">$</span>
                               <input
                                 type="number"
@@ -558,10 +545,10 @@ export default function InventoryManagementPage() {
                             <span className="font-medium">${Number(cost).toFixed(2)}</span>
                           )}
                         </td>
-                        <td className="px-6 py-3.5 text-right space-x-2">
+                        <td className="px-6 py-4 text-right space-x-2">
                           <button
                             onClick={() => setSelectedItemForMovement(item)}
-                            className="bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 shadow-xs transition"
+                            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
                           >
                             Adjust
                           </button>
@@ -569,7 +556,7 @@ export default function InventoryManagementPage() {
                           {isAdmin && (
                             <button
                               onClick={() => handleDeleteItem(item.id)}
-                              className="bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs"
+                              className="bg-rose-50 text-rose-600 hover:bg-rose-100 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
                             >
                               Delete
                             </button>
