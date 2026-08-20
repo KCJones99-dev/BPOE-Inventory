@@ -307,6 +307,7 @@ export default function InventoryManagementPage() {
               <tr>
                 <th className="p-3">Item Name</th>
                 <th className="p-3">Category</th>
+                <th className="p-3">Size</th>
                 <th className="p-3">Current Stock</th>
                 <th className="p-3">Par Level</th>
                 <th className="p-3">Unit Cost</th>
@@ -323,12 +324,14 @@ export default function InventoryManagementPage() {
                   <tr key={item.id} className="border-b hover:bg-gray-50">
                     <td className="p-3 font-medium text-gray-900">
                       {item.name}
-                      <span className="block text-xs text-gray-400">{item.bottle_size_ml} ml</span>
                     </td>
                     <td className="p-3">
                       <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-semibold">
                         {item.category}
                       </span>
+                    </td>
+                    <td className="p-3 text-gray-600">
+                      {item.bottle_size_ml} ml
                     </td>
                     <td className="p-3">
                       <span className={`px-2 py-1 rounded text-sm font-bold ${isLow ? 'bg-red-100 text-red-700' : 'text-gray-800'}`}>
