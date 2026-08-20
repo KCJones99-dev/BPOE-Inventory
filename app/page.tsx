@@ -5,13 +5,12 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-export default function InventoryPage() {
-  // Initialize Supabase safely inside the client-side component
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  );
+// Initialize with safe fallbacks so the build parser never throws an URL error
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export default function InventoryPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +31,7 @@ export default function InventoryPage() {
     }
 
     fetchInventory();
-  }, [supabase]);
+  }, []);
 
   return (
     <main className="p-8 max-w-4xl mx-auto">
