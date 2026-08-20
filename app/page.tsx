@@ -5,10 +5,9 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// Hardcoded directly to bypass Vercel environment variable injection bugs during build
 const supabase = createClient(
-  'https://ljizxogaenpsvjwdfsht.supabase.co',
-  'sb_publishable_ogNC4cEyQigxxuSZqs7hNg__8nm8_32'
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
 export default function InventoryPage() {
@@ -18,11 +17,25 @@ export default function InventoryPage() {
   useEffect(() => {
     async function fetchInventory() {
       try {
-        const { data, error } = await supabase.from('inventory').select('*');
+        const { data, error } = await supabase
+          .from('items')
+          .select(`
+            id,
+            name,
+            category,
+            inventory_counts (
+              quantity
+            )
+          `);
+
         if (error) {
           console.error('Error fetching inventory:', error);
         } else if (data) {
-          setItems(data);
+          const formattedItems = data.map((item: any) => ({
+            ...item,
+            quantity: item.inventory_counts?.[0]?.quantity ?? 0
+          }));
+          setItems(formattedItems);
         }
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -56,7 +69,7 @@ export default function InventoryPage() {
               {items.map((item, index) => (
                 <tr key={item.id || index} className="border-b hover:bg-gray-50">
                   <td className="p-3">{item.name || item.item_name || 'Unnamed'}</td>
-                  <td className="p-3">{item.quantity ?? item.stock ?? 0}</td>
+                  <td className="p-3">{item.quantity}</td>
                   <td className="p-3">{item.category || 'General'}</td>
                 </tr>
               ))}
