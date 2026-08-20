@@ -18,7 +18,7 @@ export default function InventoryPage() {
   useEffect(() => {
     async function fetchInventory() {
       try {
-        const { data, error } = await supabase.from('inventory').select('*');
+        const { data, error } = await supabase.from('items').select('*');
         if (error) {
           console.error('Error fetching inventory:', error);
         } else if (data) {
