@@ -302,6 +302,28 @@ export default function InventoryManagementPage() {
 
   return (
     <main className="min-h-screen bg-[#F2F2F7] text-slate-900 p-4 md:p-8 font-sans antialiased">
+      <style jsx global>{`
+        @media print {
+          body {
+            background: white !important;
+          }
+          main > div > *:not(#reorder-report-container) {
+            display: none !important;
+          }
+          #reorder-report-container {
+            display: block !important;
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
+
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Navigation Bar / Header Card */}
@@ -513,17 +535,25 @@ export default function InventoryManagementPage() {
 
         {/* --- REORDER REPORT PANEL (Admin Only) --- */}
         {isAdmin && showReorderReport && (
-          <div className="bg-white/95 backdrop-blur-xl border border-amber-100 p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] space-y-4">
+          <div id="reorder-report-container" className="bg-white/95 backdrop-blur-xl border border-amber-100 p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Reorder Report</h2>
                 <p className="text-xs text-slate-500">Items currently below their reorder level requiring replenishment.</p>
               </div>
-              <div className="bg-amber-50 border border-amber-200/60 px-4 py-2 rounded-2xl flex items-center gap-3">
-                <div>
-                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-amber-600">Estimated Restock Cost</span>
-                  <span className="text-sm font-bold text-amber-900">${estimatedReorderCost.toFixed(2)}</span>
+              <div className="flex items-center gap-3">
+                <div className="bg-amber-50 border border-amber-200/60 px-4 py-2 rounded-2xl flex items-center gap-3">
+                  <div>
+                    <span className="block text-[10px] font-semibold uppercase tracking-wider text-amber-600">Estimated Restock Cost</span>
+                    <span className="text-sm font-bold text-amber-900">${estimatedReorderCost.toFixed(2)}</span>
+                  </div>
                 </div>
+                <button
+                  onClick={() => window.print()}
+                  className="no-print bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-medium hover:bg-slate-800 active:scale-95 transition-all shadow-sm flex items-center gap-1.5"
+                >
+                  <span>🖨️</span> Print Report
+                </button>
               </div>
             </div>
 
