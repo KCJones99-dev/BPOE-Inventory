@@ -346,10 +346,11 @@ export default function InventoryManagementPage() {
           body {
             background: white !important;
           }
-          main > div > *:not(#reorder-report-container) {
+          /* Hide everything except the main inventory list container */
+          main > div > *:not(#inventory-list-container) {
             display: none !important;
           }
-          #reorder-report-container {
+          #inventory-list-container {
             display: block !important;
             box-shadow: none !important;
             border: none !important;
@@ -359,6 +360,12 @@ export default function InventoryManagementPage() {
           }
           .no-print {
             display: none !important;
+          }
+          input, select {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
           }
         }
       `}</style>
@@ -791,7 +798,7 @@ export default function InventoryManagementPage() {
         )}
 
         {/* Live Search Bar Card */}
-        <div className="bg-white/90 backdrop-blur-xl border border-white/80 p-4 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="no-print bg-white/90 backdrop-blur-xl border border-white/80 p-4 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative w-full sm:w-80">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400 text-xs">🔍</span>
             <input
@@ -802,13 +809,21 @@ export default function InventoryManagementPage() {
               className="w-full bg-[#F2F2F7] border border-transparent rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition-all shadow-inner"
             />
           </div>
-          <div className="text-xs text-slate-500 font-medium px-2">
-            Showing {filteredItems.length} of {items.length} items
+          <div className="flex items-center gap-3">
+            <div className="text-xs text-slate-500 font-medium px-2">
+              Showing {filteredItems.length} of {items.length} items
+            </div>
+            <button
+              onClick={() => window.print()}
+              className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-medium hover:bg-slate-800 active:scale-95 transition-all shadow-sm flex items-center gap-1.5"
+            >
+              <span>🖨️</span> Print List
+            </button>
           </div>
         </div>
 
         {/* Inventory List Container */}
-        <div className="bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden">
+        <div id="inventory-list-container" className="bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-sm">Loading inventory items...</div>
           ) : filteredItems.length === 0 ? (
@@ -834,7 +849,7 @@ export default function InventoryManagementPage() {
                     <th className="px-6 py-4">Current Stock</th>
                     <th className="px-6 py-4">Reorder Level</th>
                     <th className="px-6 py-4">Unit Cost</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-6 py-4 text-right no-print">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -907,7 +922,7 @@ export default function InventoryManagementPage() {
                             <span className="font-medium">${Number(cost).toFixed(2)}</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-right space-x-2">
+                        <td className="px-6 py-4 text-right space-x-2 no-print">
                           <button
                             onClick={() => setSelectedItemForMovement(item)}
                             className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
