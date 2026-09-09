@@ -164,21 +164,21 @@ export default function InventoryManagementPage() {
   function getCategoryBadgeClass(category: string) {
     switch (category?.toLowerCase()) {
       case 'beer':
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-amber-500 text-white';
       case 'wine':
-        return 'bg-rose-100 text-rose-900';
+        return 'bg-rose-600 text-white';
       case 'spirit':
       case 'spirits':
-        return 'bg-blue-50 text-blue-700';
+        return 'bg-blue-600 text-white';
       case 'syrup':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-500 text-white';
       case 'mixer':
-        return 'bg-teal-100 text-teal-800';
+        return 'bg-teal-600 text-white';
       case 'supply':
       case 'supplies':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-600 text-white';
       default:
-        return 'bg-slate-100 text-slate-700';
+        return 'bg-slate-600 text-white';
     }
   }
 
@@ -813,7 +813,7 @@ export default function InventoryManagementPage() {
                           {item.name}
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-medium ${getCategoryBadgeClass(item.category)}`}>
+                          <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm ${getCategoryBadgeClass(item.category)}`}>
                             {item.category}
                           </span>
                         </td>
