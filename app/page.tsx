@@ -161,6 +161,27 @@ export default function InventoryManagementPage() {
     setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
   }
 
+  function getCategoryBadgeClass(category: string) {
+    switch (category?.toLowerCase()) {
+      case 'beer':
+        return 'bg-amber-100 text-amber-800';
+      case 'wine':
+        return 'bg-rose-100 text-rose-900';
+      case 'spirit':
+      case 'spirits':
+        return 'bg-blue-50 text-blue-700';
+      case 'syrup':
+        return 'bg-orange-100 text-orange-800';
+      case 'mixer':
+        return 'bg-teal-100 text-teal-800';
+      case 'supply':
+      case 'supplies':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-slate-100 text-slate-700';
+    }
+  }
+
   async function handleUpdateField(id: string, field: string, value: any) {
     if (!isAdmin) return;
     try {
@@ -588,7 +609,7 @@ export default function InventoryManagementPage() {
                               {item.name}
                             </td>
                             <td className="px-4 py-2.5">
-                              <span className="inline-flex px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-[10px] font-semibold uppercase tracking-wider">
+                              <span className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider ${getCategoryBadgeClass(item.category)}`}>
                                 {item.category}
                               </span>
                             </td>
@@ -655,7 +676,7 @@ export default function InventoryManagementPage() {
                   type="text"
                   value={newSize}
                   onChange={(e) => setNewSize(e.target.value)}
-                  placeholder="e.g. 750 mL, Keg, Case"
+                  placeholder="e.g. 750 mL, 1 Keg, 1 Case"
                   className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
                 />
               </div>
@@ -792,7 +813,7 @@ export default function InventoryManagementPage() {
                           {item.name}
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">
+                          <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-medium ${getCategoryBadgeClass(item.category)}`}>
                             {item.category}
                           </span>
                         </td>
