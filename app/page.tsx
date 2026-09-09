@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -17,6 +17,9 @@ export default function InventoryManagementPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLoginModal, setShowAdminLoginModal] = useState(false);
@@ -160,6 +163,16 @@ export default function InventoryManagementPage() {
   function toggleSort() {
     setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
   }
+
+  // Filter items live based on what's typed in the search bar
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const query = searchQuery.toLowerCase();
+      const nameMatch = item.name?.toLowerCase().includes(query);
+      const categoryMatch = item.category?.toLowerCase().includes(query);
+      return nameMatch || categoryMatch;
+    });
+  }, [items, searchQuery]);
 
   function getCategoryBadgeClass(category: string) {
     switch (category?.toLowerCase()) {
@@ -772,12 +785,31 @@ export default function InventoryManagementPage() {
           </div>
         )}
 
+        {/* Live Search Bar Card */}
+        <div className="bg-white/90 backdrop-blur-xl border border-white/80 p-4 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="relative w-full sm:w-80">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400 text-xs">🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search items or categories..."
+              className="w-full bg-[#F2F2F7] border border-transparent rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+            />
+          </div>
+          <div className="text-xs text-slate-500 font-medium px-2">
+            Showing {filteredItems.length} of {items.length} items
+          </div>
+        </div>
+
         {/* Inventory List Container */}
         <div className="bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden">
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-sm">Loading inventory items...</div>
-          ) : items.length === 0 ? (
-            <div className="p-12 text-center text-slate-400 text-sm">No items added to the inventory yet.</div>
+          ) : filteredItems.length === 0 ? (
+            <div className="p-12 text-center text-slate-400 text-sm">
+              {items.length === 0 ? 'No items added to the inventory yet.' : `No matching items found for "${searchQuery}"`}
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -801,7 +833,7 @@ export default function InventoryManagementPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
-                  {items.map((item) => {
+                  {filteredItems.map((item) => {
                     const stock = item.current_stock ?? 0;
                     const par = item.par_level ?? 0;
                     const cost = item.unit_cost ?? 0;
