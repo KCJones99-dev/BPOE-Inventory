@@ -27,7 +27,7 @@ export default function InventoryManagementPage() {
 
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('Spirit');
-  const [newSize, setNewSize] = useState(750);
+  const [newSize, setNewSize] = useState('750 mL');
   const [newCost, setNewCost] = useState('');
   const [newPar, setNewPar] = useState(5);
 
@@ -41,6 +41,9 @@ export default function InventoryManagementPage() {
   const [logLoading, setLogLoading] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  // Reorder Report State
+  const [showReorderReport, setShowReorderReport] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -185,7 +188,7 @@ export default function InventoryManagementPage() {
         {
           name: newName,
           category: newCategory,
-          bottle_size_ml: Number(newSize),
+          bottle_size_ml: newSize,
           unit_cost: Number(newCost) || 0,
           par_level: Number(newPar)
         }
@@ -210,9 +213,10 @@ export default function InventoryManagementPage() {
 
     const multiplier = movementType === 'delivery' ? 1 : -1;
     const finalChange = Number(movementQty) * multiplier;
-    const finalChangeMl = finalChange * (selectedItemForMovement.bottle_size_ml || 0);
     
-    // Calculate transaction amount: Unit Cost X Quantity (only for deliveries)
+    const parsedMl = parseInt(selectedItemForMovement.bottle_size_ml) || 0;
+    const finalChangeMl = finalChange * parsedMl;
+    
     const unitCost = Number(selectedItemForMovement.unit_cost) || 0;
     const transactionTotal = movementType === 'delivery' ? Number(movementQty) * unitCost : 0;
 
@@ -288,6 +292,14 @@ export default function InventoryManagementPage() {
     );
   }
 
+  // Filter low stock items for the Reorder Report
+  const lowStockItems = items.filter(item => (item.current_stock ?? 0) < (item.par_level ?? 0));
+  const estimatedReorderCost = lowStockItems.reduce((acc, item) => {
+    const deficit = (item.par_level ?? 0) - (item.current_stock ?? 0);
+    const cost = Number(item.unit_cost) || 0;
+    return acc + (deficit * cost);
+  }, 0);
+
   return (
     <main className="min-h-screen bg-[#F2F2F7] text-slate-900 p-4 md:p-8 font-sans antialiased">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -316,6 +328,7 @@ export default function InventoryManagementPage() {
                 setIsAuthenticated(false);
                 setIsAdmin(false);
                 setShowActivityReport(false);
+                setShowReorderReport(false);
               }}
               className="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-medium hover:bg-slate-200 active:scale-95 transition-all text-xs"
             >
@@ -338,10 +351,22 @@ export default function InventoryManagementPage() {
                   Exit Admin
                 </button>
                 <button
-                  onClick={() => setShowActivityReport(!showActivityReport)}
+                  onClick={() => {
+                    setShowActivityReport(!showActivityReport);
+                    if (!showActivityReport) setShowReorderReport(false);
+                  }}
                   className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-indigo-500 active:scale-95 transition-all text-xs shadow-md shadow-indigo-600/15"
                 >
                   {showActivityReport ? 'Hide Activity Report' : 'Activity Report'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowReorderReport(!showReorderReport);
+                    if (!showReorderReport) setShowActivityReport(false);
+                  }}
+                  className="bg-amber-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-amber-500 active:scale-95 transition-all text-xs shadow-md shadow-amber-600/15"
+                >
+                  {showReorderReport ? 'Hide Reorder Report' : `Reorder Report (${lowStockItems.length})`}
                 </button>
                 <button
                   onClick={() => setShowAddForm(!showAddForm)}
@@ -359,7 +384,7 @@ export default function InventoryManagementPage() {
           <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-200">
               <h2 className="text-lg font-semibold text-slate-900 mb-1">Enter Admin PIN</h2>
-              <p className="text-xs text-slate-500 mb-4">Required to view activity reports, add items, change costs, or delete entries.</p>
+              <p className="text-xs text-slate-500 mb-4">Required to view reports, add items, change costs, or delete entries.</p>
               <form onSubmit={handleAdminLogin} className="space-y-3">
                 <input
                   type="password"
@@ -486,6 +511,83 @@ export default function InventoryManagementPage() {
           </div>
         )}
 
+        {/* --- REORDER REPORT PANEL (Admin Only) --- */}
+        {isAdmin && showReorderReport && (
+          <div className="bg-white/95 backdrop-blur-xl border border-amber-100 p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Reorder Report</h2>
+                <p className="text-xs text-slate-500">Items currently below their reorder level requiring replenishment.</p>
+              </div>
+              <div className="bg-amber-50 border border-amber-200/60 px-4 py-2 rounded-2xl flex items-center gap-3">
+                <div>
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-amber-600">Estimated Restock Cost</span>
+                  <span className="text-sm font-bold text-amber-900">${estimatedReorderCost.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+              {lowStockItems.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-xs">All inventory levels are healthy! No items need reordering.</div>
+              ) : (
+                <div className="overflow-x-auto max-h-72 overflow-y-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead className="sticky top-0 bg-slate-100/90 backdrop-blur-sm text-[10px] uppercase tracking-wider text-slate-500 font-semibold border-b border-slate-200">
+                      <tr>
+                        <th className="px-4 py-3">Item Name</th>
+                        <th className="px-4 py-3">Category</th>
+                        <th className="px-4 py-3">Size / Format</th>
+                        <th className="px-4 py-3">Current Stock</th>
+                        <th className="px-4 py-3">Par Level</th>
+                        <th className="px-4 py-3">Deficit (Needed)</th>
+                        <th className="px-4 py-3">Est. Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 bg-white">
+                      {lowStockItems.map((item) => {
+                        const stock = item.current_stock ?? 0;
+                        const par = item.par_level ?? 0;
+                        const deficit = par - stock;
+                        const unitCost = Number(item.unit_cost) || 0;
+                        const totalDeficitCost = deficit * unitCost;
+
+                        return (
+                          <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-4 py-2.5 font-semibold text-slate-900">
+                              {item.name}
+                            </td>
+                            <td className="px-4 py-2.5">
+                              <span className="inline-flex px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-[10px] font-semibold uppercase tracking-wider">
+                                {item.category}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2.5 text-slate-500 font-medium">
+                              {item.bottle_size_ml || '—'}
+                            </td>
+                            <td className="px-4 py-2.5 font-bold text-rose-600">
+                              {stock} ⚠️
+                            </td>
+                            <td className="px-4 py-2.5 text-slate-600 font-semibold">
+                              {par}
+                            </td>
+                            <td className="px-4 py-2.5 font-bold text-amber-600">
+                              +{deficit}
+                            </td>
+                            <td className="px-4 py-2.5 font-semibold text-slate-700">
+                              {unitCost > 0 ? `$${totalDeficitCost.toFixed(2)}` : '—'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Add New Item Form Card */}
         {isAdmin && showAddForm && (
           <div className="bg-white/90 backdrop-blur-xl border border-white/80 p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
@@ -518,11 +620,12 @@ export default function InventoryManagementPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Bottle Size (mL)</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Size / Format</label>
                 <input
-                  type="number"
+                  type="text"
                   value={newSize}
-                  onChange={(e) => setNewSize(Number(e.target.value))}
+                  onChange={(e) => setNewSize(e.target.value)}
+                  placeholder="e.g. 750 mL, Keg, Case"
                   className="w-full bg-[#F2F2F7] border border-transparent rounded-xl p-3 text-sm text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
                 />
               </div>
@@ -639,7 +742,7 @@ export default function InventoryManagementPage() {
                       </button>
                     </th>
                     <th className="px-6 py-4">Category</th>
-                    <th className="px-6 py-4">Size</th>
+                    <th className="px-6 py-4">Size / Format</th>
                     <th className="px-6 py-4">Current Stock</th>
                     <th className="px-6 py-4">Reorder Level</th>
                     <th className="px-6 py-4">Unit Cost</th>
@@ -664,7 +767,16 @@ export default function InventoryManagementPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-slate-500 font-medium">
-                          {item.bottle_size_ml} mL
+                          {isAdmin ? (
+                            <input
+                              type="text"
+                              defaultValue={item.bottle_size_ml || ''}
+                              onBlur={(e) => handleUpdateField(item.id, 'bottle_size_ml', e.target.value)}
+                              className="w-28 bg-[#F2F2F7] border border-transparent rounded-lg px-2.5 py-1.5 text-sm font-semibold text-slate-700 focus:bg-white focus:border-purple-500 transition-all"
+                            />
+                          ) : (
+                            <span>{item.bottle_size_ml || '—'}</span>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
