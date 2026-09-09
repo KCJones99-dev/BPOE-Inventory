@@ -171,7 +171,7 @@ export default function InventoryManagementPage() {
       case 'spirits':
         return 'bg-blue-600 text-white';
       case 'syrup':
-        return 'bg-orange-500 text-white';
+        return 'bg-lime-500 text-white';
       case 'mixer':
         return 'bg-teal-600 text-white';
       case 'supply':
