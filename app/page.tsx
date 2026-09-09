@@ -326,8 +326,13 @@ export default function InventoryManagementPage() {
     );
   }
 
-  // Filter low stock items for the Reorder Report
-  const lowStockItems = items.filter(item => (item.current_stock ?? 0) < (item.par_level ?? 0));
+  // Filter low stock items for the Reorder Report (Excluding discontinued items where par_level is 0)
+  const lowStockItems = items.filter(item => {
+    const stock = item.current_stock ?? 0;
+    const par = item.par_level ?? 0;
+    return par > 0 && stock < par;
+  });
+
   const estimatedReorderCost = lowStockItems.reduce((acc, item) => {
     const deficit = (item.par_level ?? 0) - (item.current_stock ?? 0);
     const cost = Number(item.unit_cost) || 0;
@@ -705,7 +710,7 @@ export default function InventoryManagementPage() {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Reorder Level</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Reorder Level (0 = Discontinued)</label>
                 <input
                   type="number"
                   value={newPar}
@@ -837,7 +842,9 @@ export default function InventoryManagementPage() {
                     const stock = item.current_stock ?? 0;
                     const par = item.par_level ?? 0;
                     const cost = item.unit_cost ?? 0;
-                    const isLow = stock < par;
+                    
+                    const isDiscontinued = par === 0;
+                    const isLow = !isDiscontinued && stock < par;
 
                     return (
                       <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
@@ -863,11 +870,13 @@ export default function InventoryManagementPage() {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
-                            isLow 
+                            isDiscontinued
+                              ? 'bg-slate-200 text-slate-600'
+                              : isLow 
                               ? 'bg-rose-50 text-rose-600' 
                               : 'bg-slate-100 text-slate-700'
                           }`}>
-                            {stock} {isLow && '⚠️ Low'}
+                            {stock} {isDiscontinued ? '🚫 Discontinued' : isLow && '⚠️ Low'}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-slate-600">
